@@ -37,10 +37,12 @@ function sumValues($arr, $arrayNumber)
     // 2) After the loop, format $total to 2 decimal places using number_format.
     // 3) Store formatted result into $modifiedTotal.
     // Solve Challenge 1 here: Sum all values
-
+    foreach($arr as $value) {
+        $total += $value;
+    }
 
     // Solve Challenge 2 here: Format to 2 decimal places
-    $modifiedTotal = "?";
+    $modifiedTotal = number_format($total, 2, '.', '');
 
     // End Solution Edits
     printScenario2Output($total, $modifiedTotal);
