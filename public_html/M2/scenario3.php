@@ -37,6 +37,20 @@ function bePositive($arr, $arrayNumber)
     // 2) Detect the original type (int, float, string).
     // 3) Convert to a number, take abs() to make it positive.
     // 4) Convert back to the original type and store in $output at the same index.
+
+    for ($i = 0; $i < count($arr); $i++){
+        $value = $arr[$i];
+
+        if (is_int($value)){
+            $output[$i] = abs($value);
+        } elseif (is_float($value)) {
+            $output[$i] = abs($value);
+        } elseif (is_string($value)){
+            $output[$i] = (string) abs((float)$value);
+        } else {
+            $output[$i] = $value;
+        }
+    }
     
 
     // End Solution Edits
