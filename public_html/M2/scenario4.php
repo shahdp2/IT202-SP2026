@@ -45,6 +45,46 @@ function transformText($arr, $arrayNumber) {
         // 3) Remove extra spaces between words (keep replacing double spaces).
         // 4) Convert to Title Case.
 
+        $clean = "";
+        $len = strlen($text);
+
+        for ($i = 0; $i < $len; $i++) {
+            $ch = $text[$i];
+
+            // ctype_alnum checks letter or digit
+            if (ctype_alnum($ch) || $ch === " ") {
+                $clean .= $ch;
+            }
+        }
+
+        $clean = trim($clean);
+
+        while (strpos($clean, "  ") !== false) {
+            $clean = str_replace("  ", " ", $clean);
+        }
+
+        $clean = strtolower($clean);
+        $clean = ucwords($clean);
+
+        $placeholderForModifiedPhrase = $clean;
+
+        $noSpaces = str_replace(" ", "", $placeholderForModifiedPhrase);
+        $len = strlen($noSpaces);
+
+        if ($len < 3) {
+            $placeholderForMiddleCharacters = "Not enough characters";
+        } else {
+            $mid = intdiv($len, 2);
+
+            $start = $mid - 1;
+            
+            if ($start < 0) $start = 0;
+            if ($start > $len - 3) $start = $len - 3;
+
+            $placeholderForMiddleCharacters = substr($noSpaces, $start, 3);
+        }
+
+
         // End Solution Edits
     
         printScenario4Transformations($index, $placeholderForModifiedPhrase, $placeholderForMiddleCharacters);
