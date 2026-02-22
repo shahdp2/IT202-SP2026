@@ -37,7 +37,13 @@ function printOdds($arr, $arrayNumber)
     // 3) Use implode(", ", $odds) to build a comma+space separated string with no leading/trailing commas.
     // 4) Store final string into $output_result.
 
-
+    $odds = [];
+    foreach ($arr as $v) {
+        if ($v %2 != 0) {
+            $odds[] = $v;
+        }
+    }
+    $output_result = implode(", ", $odds);
     // End Solution Edits
     printScenario1Output($output_result);
     echo "</div>";
