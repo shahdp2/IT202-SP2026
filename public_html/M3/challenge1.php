@@ -58,7 +58,9 @@ Requirements:
 <style>
     /* You're free to make whatever edits you need here, just don't override anything in the styles.css */
     /* See the requirements at the top. If easier, you may copy/paste them here*/
-    html, body{
+
+    /* UCID: dns33 */
+   html, body{
         height: 100%;
         margin: 0;
     }
@@ -84,5 +86,4 @@ Requirements:
          min-height: 0;         
     }
     
-
 </style>

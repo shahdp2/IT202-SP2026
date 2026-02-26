@@ -30,13 +30,13 @@ Requirements:
 <body class="challenge2">
     <nav>
         <ul>
-            <li><a href="challenge1.html">Challenge 1</a></li>
-            <li><a href="challenge2.html" class="active">Challenge 2</a></li>
-            <li><a href="challenge3.html">Challenge 3</a></li>
+            <li><a href="challenge1.php">Challenge 1</a></li>
+            <li><a href="challenge2.php" class="active">Challenge 2</a></li>
+            <li><a href="challenge3.php">Challenge 3</a></li>
         </ul>
     </nav>
     <!-- Edit your UCID here -->
-    <header>Header Section (mt85)</header>
+    <header>Header Section (dns33)</header>
     <!-- Don't make any other edits to the HTML -->
     <div class="container">
         <aside id="left-sidebar">
@@ -94,10 +94,100 @@ Requirements:
 
 <script src="util.js"></script>
 
+<!-- 
+    UCID:- dns33
+-->
+
 <script>
-    /* Solve the button logic here by finding and attaching an appropriate event listener and logic*/
+  const leftSidebar = document.getElementById("left-sidebar");
+  const rightSidebar = document.getElementById("right-sidebar");
+
+  const leftButton = leftSidebar.querySelector("button");
+  const rightButton = rightSidebar.querySelector("button");
+
+  leftButton.addEventListener("click", () => {
+    leftSidebar.classList.toggle("collapsed");
+  });
+
+  rightButton.addEventListener("click", () => {
+    rightSidebar.classList.toggle("collapsed");
+  });
 </script>
 
 <style>
-    /* You're free to make whatever edits you need here, just don't override anything in the styles.css */
+  html, body { height: 100%; margin: 0; }
+
+  body.challenge2 {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  body.challenge2 .container {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+  }
+
+  #left-sidebar, #right-sidebar {
+    width: 15%;
+    min-width: 15%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+ 
+  body.challenge2 main.content {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-y: auto;
+  }
+
+  
+  #left-sidebar:not(.collapsed) button,
+  #right-sidebar:not(.collapsed) button {
+    width: 100%;
+    height: 28px;
+    padding: 0;
+    position: static;    
+  }
+
+  #left-sidebar:not(.collapsed) ul,
+  #right-sidebar:not(.collapsed) ul {
+    margin-top: 0;
+  }
+
+   #left-sidebar.collapsed,
+  #right-sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    overflow: visible !important; 
+  }
+
+  #left-sidebar.collapsed ul,
+  #right-sidebar.collapsed ul {
+    display: none;
+  }
+
+  #left-sidebar.collapsed button,
+  #right-sidebar.collapsed button {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    position: absolute;  
+    top: 0;
+    z-index: 9999;
+  }
+
+  #left-sidebar.collapsed button { left: 0; }
+  #right-sidebar.collapsed button { right: 0; }
 </style>
+
+
