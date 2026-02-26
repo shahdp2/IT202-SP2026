@@ -26,13 +26,13 @@ Requirements:
 <body class="challenge3">
     <nav>
         <ul>
-            <li><a href="challenge1.html">Challenge 1</a></li>
-            <li><a href="challenge2.html" >Challenge 2</a></li>
-            <li><a href="challenge3.html" class="active">Challenge 3</a></li>
+            <li><a href="challenge1.php">Challenge 1</a></li>
+            <li><a href="challenge2.php" >Challenge 2</a></li>
+            <li><a href="challenge3.php" class="active">Challenge 3</a></li>
         </ul>
     </nav>
     <!-- Edit your UCID here -->
-    <header>Header Section (mt85)</header>
+    <header>Header Section (dns33)</header>
     <!-- Don't make any other edits to the HTML -->
     <nav>
         <button>Previous</button>
@@ -76,9 +76,109 @@ Requirements:
 <script src="util.js"></script>
 
 <script>
-    /* Solve the button logic here by finding and attaching an appropriate event listener and logic*/
+  // UCID: dns33
+
+  const panels = document.querySelectorAll(".carousel-container .panel");
+  const buttons = document.querySelectorAll("body.challenge3 nav button");
+  const prevBtn = buttons[0];
+  const nextBtn = buttons[1];
+
+  let currentIndex = 0;
+
+  function showPanel(index) {
+    panels.forEach((p, i) => {
+      p.classList.toggle("active", i === index);
+    });
+  }
+
+  prevBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + panels.length) % panels.length;
+    showPanel(currentIndex);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % panels.length;
+    showPanel(currentIndex);
+  });
+
+
+  showPanel(currentIndex);
 </script>
 
 <style>
-    /* You're free to make whatever edits you need here, just don't override anything in the styles.css */
+  /* UCID: dns33 */
+
+  html, body { height: 100%; margin: 0; }
+
+  body.challenge3 {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Center the Previous/Next buttons (the 2nd nav) */
+  body.challenge3 nav:nth-of-type(2) {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 0;
+    flex: 0 0 auto;
+  }
+
+  /* Carousel full width */
+  .carousel {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .carousel-container {
+    width: 100%;
+    height: 320px; /* adjust if needed */
+  }
+
+  /* Panel fills carousel and centers the content block */
+  .panel {
+    width: 100%;
+    height: 100%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .panel.active {
+    display: flex;
+  }
+
+  /* Content block centered, but text is left aligned for proper bullets */
+  .panel > div {
+    max-width: 900px;
+    padding: 20px;
+    text-align: left;
+  }
+
+      /* Bullet structure + spacing like the reference */
+    /* Fix list structure/indent so bullets are normal */
+    .panel ul {
+      display: block;                 /* IMPORTANT: not inline-block */
+      text-align: left;
+      margin: 10px 0 0 0;
+      padding-left: 40px;             /* normal indent like screenshot */
+      list-style-position: outside;
+    }
+
+    .panel ul ul {
+      margin-top: 6px;
+      padding-left: 40px;
+      list-style-position: outside;
+    }
+
+    .panel li {
+      margin: 6px 0;
+    }
+
+      /* Optional: give a little space under "Panel 0:" line */
+    .panel > div > div {
+        margin-bottom: 8px;
+    }
 </style>
