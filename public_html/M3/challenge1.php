@@ -21,13 +21,13 @@ Requirements:
 <body class="challenge1">
     <nav>
         <ul>
-            <li><a href="challenge1.html" class="active">Challenge 1</a></li>
-            <li><a href="challenge2.html">Challenge 2</a></li>
-            <li><a href="challenge3.html">Challenge 3</a></li>
+            <li><a href="challenge1.php" class="active">Challenge 1</a></li>
+            <li><a href="challenge2.php">Challenge 2</a></li>
+            <li><a href="challenge3.php">Challenge 3</a></li>
         </ul>
     </nav>
     <!-- Edit your UCID here -->
-    <header>Header Section (mt85)</header>
+    <header>Header Section (dns33)</header>
     <!-- Don't make any other edits to the HTML -->
     <main>
         <div class="content">
@@ -58,4 +58,31 @@ Requirements:
 <style>
     /* You're free to make whatever edits you need here, just don't override anything in the styles.css */
     /* See the requirements at the top. If easier, you may copy/paste them here*/
+    html, body{
+        height: 100%;
+        margin: 0;
+    }
+
+    body.challenge1 {
+        height:100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    body.challenge1 nav {
+        flex: 0 0 auto;
+    }
+    body.challenge1 header,
+    body.challenge1 footer {
+        flex: 0 0 auto;
+    }
+
+    body.challenge1 main {
+        flex: 1 1 auto;
+        overflow-y: auto;      
+         min-height: 0;         
+    }
+    
+
 </style>
