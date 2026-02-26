@@ -1,0 +1,193 @@
+<!--
+Challenge 2: Sidebar Layout with Collapsing Sidebars
+-----------------------------------------------------
+Requirements:
+ Using CSS, adjust the layout per the following (don't override any of the CSS from styles.css)
+ #1: Header is at the top
+ #2: Content takes up the rest of the height
+ #3: Both sidebars docked to the respective side and take up 15% width; 
+ Content area should utilize the remaining width
+
+ Using JavaScript complete the following
+ #4: Attach the appropriate event listener to the buttons
+ #5: Individual toggle the respective panel between collapsed and uncollapsed 
+ (Don't lose the button in the process)
+ #6: The content should adjust based on the status of the respective sidebars
+ (i.e., take up more left, right, or both space)
+
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar Layout</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="challenge2">
+    <nav>
+        <ul>
+            <li><a href="challenge1.php">Challenge 1</a></li>
+            <li><a href="challenge2.php" class="active">Challenge 2</a></li>
+            <li><a href="challenge3.php">Challenge 3</a></li>
+        </ul>
+    </nav>
+    <!-- Edit your UCID here -->
+    <header>Header Section (dns33)</header>
+    <!-- Don't make any other edits to the HTML -->
+    <div class="container">
+        <aside id="left-sidebar">
+            <button>&gt;</button>
+            <ul>
+                <li>Item 1</li>
+                <li>Item 2</li>
+                <li>Item 3</li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h2>Lorem Ipsum</h2>
+            <section>
+                <!-- Challenge Requirements -->
+                <h3>Requirements</h3>
+                <ul>
+                    <li>CSS Requirements:
+                        <ul>
+                            <li>Header is at the top</li>
+                            <li>Content takes up the rest of the height</li>
+                            <li>Both sidebars docked to the respective side and take up 15% width</li>
+                            <li>Content area should utilize the remaining width</li>
+                        </ul>
+                    </li>
+                    <li>JavaScript Requirements:
+                        <ul>
+                            <li>Attach the appropriate event listener to the buttons</li>
+                            <li>Individually toggle the respective panel between collapsed and uncollapsed (don't lose the button in the process)</li>
+                            <li>The content should adjust based on the status of the respective sidebars (i.e., take up more left, right, or both space)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <p>Praesent arcu neque, ornare vitae dolor eget, dapibus sagittis ante. Donec vehicula mi a finibus
+                malesuada. Vivamus dictum nisl a felis varius, id sodales turpis fringilla. In elit urna, rhoncus at
+                turpis ut, pellentesque iaculis odio. Nam eu felis molestie, eleifend dolor id, bibendum mi. Donec
+                pellentesque sem at sapien bibendum, quis aliquam nibh aliquam. In facilisis est sapien, ut accumsan
+                arcu rutrum id. Fusce a varius libero, at varius ex. Donec odio tellus, finibus eget quam ac, maximus
+                consequat neque.</p>
+        </main>
+
+        <aside id="right-sidebar">
+            <button>&lt;</button>
+            <ul>
+                <li>Item 1</li>
+                <li>Item 2</li>
+                <li>Item 3</li>
+            </ul>
+        </aside>
+    </div>
+</body>
+
+</html>
+
+<script src="util.js"></script>
+
+<!-- 
+    UCID:- dns33
+-->
+
+<script>
+  const leftSidebar = document.getElementById("left-sidebar");
+  const rightSidebar = document.getElementById("right-sidebar");
+
+  const leftButton = leftSidebar.querySelector("button");
+  const rightButton = rightSidebar.querySelector("button");
+
+  leftButton.addEventListener("click", () => {
+    leftSidebar.classList.toggle("collapsed");
+  });
+
+  rightButton.addEventListener("click", () => {
+    rightSidebar.classList.toggle("collapsed");
+  });
+</script>
+
+<style>
+  html, body { height: 100%; margin: 0; }
+
+  body.challenge2 {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  body.challenge2 .container {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+  }
+
+  #left-sidebar, #right-sidebar {
+    width: 15%;
+    min-width: 15%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+ 
+  body.challenge2 main.content {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-y: auto;
+  }
+
+  
+  #left-sidebar:not(.collapsed) button,
+  #right-sidebar:not(.collapsed) button {
+    width: 100%;
+    height: 28px;
+    padding: 0;
+    position: static;    
+  }
+
+  #left-sidebar:not(.collapsed) ul,
+  #right-sidebar:not(.collapsed) ul {
+    margin-top: 0;
+  }
+
+   #left-sidebar.collapsed,
+  #right-sidebar.collapsed {
+    width: 0 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    overflow: visible !important; 
+  }
+
+  #left-sidebar.collapsed ul,
+  #right-sidebar.collapsed ul {
+    display: none;
+  }
+
+  #left-sidebar.collapsed button,
+  #right-sidebar.collapsed button {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    position: absolute;  
+    top: 0;
+    z-index: 9999;
+  }
+
+  #left-sidebar.collapsed button { left: 0; }
+  #right-sidebar.collapsed button { right: 0; }
+</style>
+
+
