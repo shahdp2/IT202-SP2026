@@ -58,13 +58,28 @@ if (empty($diff)) {
     <?php require_once(__DIR__ . "/../nav.php"); ?>
     <section>
         <h2>Create ToDo </h2>
-        <form>
+        <form method="GET">
             <!-- design the form with proper labels and input fields with the correct types based on the SQL table.
              Wrap each label/input pair in a div tag.
              For "Assigned" ensure the default value is "self". -->
-          
+             
             <div>
-                <input type="submit" />
+              <label for="task">Task</label>
+              <input id="task" type="text" name="task" required />
+            </div>
+            
+            <div>
+              <label for="due">Due Date</label>
+              <input id="due" type="date" name="due" required />
+            </div>
+            
+            <div>
+              <label for="assigned">Assigned</label>
+              <input id="assigned" type="text" name="assigned" value="self" />
+            </div>
+            
+            <div>
+              <input type="submit" value="Create Todo" />
             </div>
         </form>
     </section>
