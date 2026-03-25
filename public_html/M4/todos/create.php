@@ -17,8 +17,49 @@ if (empty($diff)) {
     // TODO Validate the incoming data for correct format based on the SQL table definition.
     // When not valid, provide a user-friendly message of what specifically was wrong and set $is_valid to false.
     // Assigned should check for "self" if a valid format/value isn't provided.
+
     // Start validations
     // can edit here
+
+    // UCID: dns33
+    // Date: 2026-03-02
+    // Summary: Validate task, due date format, and assigned (default to self if invalid).
+
+    $errors = [];
+    $task = trim($task);
+    if ($task === "") {
+        $errors[] = "Task cannot be empty.";
+    } elseif (strlen($task) > 100) {
+        $errors[] = "Task must be 100 characters or less.";
+    }
+
+    $due = trim($due);
+    if ($due === "") {
+        $errors[] = "Due date cannot be empty.";
+    } else {
+        $d = DateTime::createFromFormat("Y-m-d", $due);
+        if (!($d && $d->format("Y-m-d") === $due)) {
+            $errors[] = "Due date must be a valid date (YYYY-MM-DD).";
+        }
+    }
+
+    $assigned = trim($assigned);
+    if ($assigned === "" || strtolower($assigned) === "null" || strtolower($assigned) === "undefined") {
+        $assigned = "self";
+    } else {
+        if (!preg_match("/^[a-zA-Z0-9 _-]{2,30}$/", $assigned)) {
+            $assigned = "self";
+        }
+    }
+
+    if (!empty($errors)) {
+        $is_valid = false;
+        echo "<div style='color:red; font-weight:bold;'>Please fix the following:</div><ul>";
+        foreach ($errors as $e) {
+            echo "<li style='color:red;'>" . htmlspecialchars($e) . "</li>";
+        }
+        echo "</ul>";
+    }
     // End validations
 
     
@@ -28,8 +69,12 @@ if (empty($diff)) {
         Ensure valid and proper PDO named placeholders are used.
         https://phpdelusions.net/pdo
         */
-        $query = ""; // edit this
-        $params = []; // Apply the proper PDO placeholder to variable mapping here
+        // $query = "INSERT INTO M4_Todos (task, due, assigned) VALUES (:task, :due, :assigned)";
+        // $params = [
+        //     ":task" => $task,
+        //     ":due" => $due,
+        //     ":assigned" => $assigned
+        // ];
         try {
             $db = getDB();
             $stmt = $db->prepare($query);
