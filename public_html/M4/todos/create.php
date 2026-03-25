@@ -85,12 +85,16 @@ if (empty($diff)) {
                 echo "Failed to insert";
             }
         } catch (PDOException $e) {
-            // extra credit
-            // check if the exception was related to a unique constraint
-            // provide an appropriate user-friendly message for this scenario
-            // Otherwise show the default message below
-            echo "There was an error inserting the record; check the logs (terminal)";
-            error_log("Insert Error: " . var_export($e, true)); // shows in the terminal
+            // Extra credit: unique constraint (task + due)
+            // MySQL duplicate entry error code is 1062
+            if (isset($e->errorInfo[1]) && $e->errorInfo[1] == 1062) {
+                echo "<div style='color:red; font-weight:bold;'>
+                        That task already exists for that due date. Try a different task or date.
+                      </div>";
+            } else {
+                echo "There was an error inserting the record; check the logs (terminal)";
+            }
+            error_log("Insert Error: " . var_export($e, true));
         }
     } else {
         error_log("Creation input wasn't valid");
