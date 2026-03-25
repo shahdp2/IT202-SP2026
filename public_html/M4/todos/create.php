@@ -69,12 +69,12 @@ if (empty($diff)) {
         Ensure valid and proper PDO named placeholders are used.
         https://phpdelusions.net/pdo
         */
-        // $query = "INSERT INTO M4_Todos (task, due, assigned) VALUES (:task, :due, :assigned)";
-        // $params = [
-        //     ":task" => $task,
-        //     ":due" => $due,
-        //     ":assigned" => $assigned
-        // ];
+        $query = "INSERT INTO M4_Todos (task, due, assigned) VALUES (:task, :due, :assigned)";
+        $params = [
+            ":task" => $task,
+            ":due" => $due,
+            ":assigned" => $assigned
+        ];
         try {
             $db = getDB();
             $stmt = $db->prepare($query);
