@@ -12,8 +12,10 @@ if (isset($_POST["id"])) {
     Add an extra clause to update only if the complete field of the record is not set.
     https://phpdelusions.net/pdo
     */
-    $query = ""; // edit this
-    $params = []; // apply mapping
+    $query = "UPDATE M4_Todos
+              SET is_complete = 1, completed = CURRENT_DATE
+              WHERE id = :id AND is_complete = 0"; // edit this
+    $params = [":id" => $id]; // apply mapping
     
     try {
         $stmt = $db->prepare($query);
@@ -35,7 +37,12 @@ For Actions, this isn't part of the query and there's nothing special to select 
 Filter the results where the todo item is NOT completed and order the results by those due the soonest.
 No limit is required.
 */
-$query = ""; // edit this
+$query = "SELECT id, task, due,
+                 DATEDIFF(due, CURRENT_DATE) AS days_offset,
+                 assigned
+          FROM M4_Todos
+          WHERE is_complete = 0
+          ORDER BY due ASC"; // edit this
 $results = [];
 try {
     $stmt = $db->prepare($query);
