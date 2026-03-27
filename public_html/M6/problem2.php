@@ -30,10 +30,20 @@ function processCars($cars) {
     $processedCars = []; // result array
     $classic_age = 25; // don't change this value
     // Start edits
-    // UCID: dns33
-    // Date: 2026-03-27
-    // Plan: 1) get current year, 2) loop cars, 3) compute age, 4) set isClassic based on $classic_age, 5) push into $processedCars
+    /* 
+    UCID: dns33
+    Date: 2026-03-27
+    Plan: 1) get current year, 2) loop cars, 3) compute age, 
+    4) set isClassic based on $classic_age, 5) push into $processedCars 
+    */
+    $currentYear = (int)date("Y");
 
+    foreach ($cars as $car) {
+        $age = $currentYear - (int)$car["year"];
+        $car["age"] = $age;
+        $car["isClassic"] = ($age >= $classic_age);
+        $processedCars[] = $car;
+    }
 
    
     // End edits
