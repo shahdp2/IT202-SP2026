@@ -52,11 +52,27 @@ function joinArrays($users, $activities) {
     // Start edits
     /* UCID: dns33
     Date: 2026-03-27
-     Plan:
+    Plan:
      1) Build a lookup map from activities using userId as the key.
      2) Loop through users; for each userId, find matching activity in the map.
      3) Merge the user fields + activity field into one array and push to $joined.
     */
+
+    $activityMap = [];
+    foreach ($activities as $a) {
+        $activityMap[$a["userId"]] = $a; // store activity row by userId
+    }
+    
+    foreach ($users as $u) {
+        $id = $u["userId"];
+        if (isset($activityMap[$id])) {
+            // merge user info + activity into one row
+            $joined[] = array_merge($u, $activityMap[$id]);
+        } else {
+            // if no match, still include user (optional, but safe)
+            $joined[] = $u;
+        }
+    }
 
     // End edits
     echo "<pre>" . var_export($joined, true) . "</pre>";
