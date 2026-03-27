@@ -35,7 +35,7 @@ function processCars($cars) {
     echo "<pre>" . var_export($processedCars, true) . "</pre>";
     
 }
-$ucid = "mt85"; // replace with your UCID
+$ucid = "dns33"; // replace with your UCID
 printHeader($ucid, 2); 
 ?>
 <table>

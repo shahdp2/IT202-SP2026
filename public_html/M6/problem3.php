@@ -56,7 +56,7 @@ function joinArrays($users, $activities) {
     echo "<pre>" . var_export($joined, true) . "</pre>";
 }
 
-$ucid = "mt85"; // replace with your UCID
+$ucid = "dns33"; // replace with your UCID
 printHeader($ucid, 3); 
 ?>
 <table>

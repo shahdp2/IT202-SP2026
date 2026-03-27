@@ -28,12 +28,19 @@ function processBirds($birds) {
     // TODO Objective: Extract the name, color, region into a separate multi-dimension array called $subset
     $subset = []; // result array
     // Start edits
+    // UCID: dns33
+    // Date: 2026-03-26
+    // Plan:
+    // 1) Loop through each bird in $birds.
+    // 2) For each bird, create a smaller array with only name, color, region.
+    // 3) Push that smaller array into $subset.
+    // 4) Print $subset at the end (already handled below).
     
     // End edits
     echo "<pre>" . var_export($subset, true) . "</pre>";
    
 }
-$ucid = "mt85"; // replace with your UCID
+$ucid = "dns33"; // replace with your UCID
 printHeader($ucid, 1); 
 ?>
 <table>
