@@ -50,7 +50,13 @@ function joinArrays($users, $activities) {
     // TODO Objective: Add logic to join both arrays on the userId property into one $joined array
     $joined = []; // result array
     // Start edits
-    
+    /* UCID: dns33
+    Date: 2026-03-27
+     Plan:
+     1) Build a lookup map from activities using userId as the key.
+     2) Loop through users; for each userId, find matching activity in the map.
+     3) Merge the user fields + activity field into one array and push to $joined.
+    */
 
     // End edits
     echo "<pre>" . var_export($joined, true) . "</pre>";
