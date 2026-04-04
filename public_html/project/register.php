@@ -1,5 +1,5 @@
 <?php
-require(__DIR__."/../../lib/functions.php");
+require(__DIR__."/../../partials/nav.php");
 ?>
 <h3>Register</h3>
 <form onsubmit="return validate(this)" method="POST">
@@ -36,38 +36,40 @@ require(__DIR__."/../../lib/functions.php");
     $hasError = false;
 
     if (empty($email)) {
-        echo "Email must not be empty<br>";
+        //echo "Email must not be empty<br>";
+        flash("Email must not be empty.", "danger");
         $hasError = true;
     }
+    // Sanitize and validate email
+    $email = sanitize_email($email);
 
-    // $email = filter_var($email, FILTER_SANITIZE_EMAIL);
-    // if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    //     echo "Invalid email address<br>";
-    //     $hasError = true;
-    // }
-    $email = sanitize_email();
-    if(!is_valid_email($email)){
-        echo "Invalid email address";
+    
+    if (!is_valid_email($email)) {
+        //echo "Invalid email address<br>";
+        flash("Invalid email address.", "danger");
         $hasError = true;
     }
-
     if (empty($password)) {
-        echo "Password must not be empty<br>";
+        //echo "Password must not be empty<br>";
+        flash("Password must not be empty.", "danger");
         $hasError = true;
     }
 
     if (empty($confirm)) {
-        echo "Confirm password must not be empty<br>";
+        //echo "Confirm password must not be empty<br>";
+        flash("Confirm password must not be empty.", "danger");
         $hasError = true;
     }
 
     if (strlen($password) < 8) {
-        echo "Password too short<br>";
+        //echo "Password too short<br>";
+        flash("Password must be at least 8 characters long.", "danger");
         $hasError = true;
     }
 
     if ($password !== $confirm) {
-        echo "Passwords must match<br>";
+        //echo "Passwords must match<br>";
+        flash("Passwords must match.", "danger");
         $hasError = true;
     }
 
@@ -79,12 +81,17 @@ require(__DIR__."/../../lib/functions.php");
         $stmt = $db->prepare("INSERT INTO Users (email, password) VALUES (:email, :password)");
         try{
             $stmt->execute([':email' => $email, ':password' => $hashed_password]);
-            echo "Successfully registered!<br>";
+            //echo "Successfully registered!<br>";
+            flash("Successfully registered! You can now log in.", "success");
         }
         catch(Exception $e){
-            echo "There was an error registering<br>"; // user-friendly message
+            //echo "There was an error registering<br>"; // user-friendly message
+            flash("There was an error registering. Please try again.", "danger");
             error_log("Registration Error: " . var_export($e, true)); // log the technical error for debugging
         }
     }
 }
+?>
+<?php
+require(__DIR__."/../../partials/flash.php");
 ?>
