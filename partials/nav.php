@@ -39,4 +39,4 @@ require(__DIR__."/../lib/functions.php");
             <li><a href="logout.php">Logout</a></li>
         <?php endif; ?>
     </ul>
-</nav>
+</nav>x
