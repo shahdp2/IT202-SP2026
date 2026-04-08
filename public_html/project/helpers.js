@@ -14,3 +14,9 @@ function flash(message = "", color = "info") {
     //add the element to the DOM (if we don't it merely exists in memory)
     flash.appendChild(outerDiv);
 }
+
+// UCID dns33
+// Date 04/08/2026
+function isValidPassword(pass){
+    return pass?.length >= 8;
+}
