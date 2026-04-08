@@ -72,9 +72,8 @@ form {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   padding: 18px;
-
-  max-width: 700px;          
-  margin: 0 auto;            
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 form > div {
