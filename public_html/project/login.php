@@ -5,7 +5,7 @@ require(__DIR__ . "/../../partials/nav.php");
 <form onsubmit="return validate(this)" method="POST">
     <div>
         <label for="email">Email</label>
-        <input id="email" type="email" name="email" required />
+        <input id="email" type="email" name="email" required value="<?php se($_POST, 'email'); ?>" />
     </div>
     <div>
         <label for="pw">Password</label>
@@ -19,12 +19,12 @@ require(__DIR__ . "/../../partials/nav.php");
         //ensure it returns false for an error and true for success
         // UCID dns33
         // Date 04/08/2026
-        let isValid = true;
-        if(!isValidPassword(pw)){
-            flash("Password must be atleast 8 characters.");
-            isValid = false;
-        }
+        const pw = form.password.value;
 
+        if (pw.length < 8) {
+          alert("Password must be at least 8 characters.");
+          return false;
+        }
         return true;
     }
 </script>
