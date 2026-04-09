@@ -19,6 +19,7 @@ require(__DIR__ . "/../../partials/nav.php");
         //ensure it returns false for an error and true for success
         // UCID dns33
         // Date 04/08/2026
+        let isValid = true;
         if(!isValidPassword(pw)){
             flash("Password must be atleast 8 characters.");
             isValid = false;
