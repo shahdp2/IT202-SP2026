@@ -18,24 +18,29 @@
 </div>
 
 <style>
-    #flash {
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-        opacity: 0.9;
-        z-index: 1000;
-        position: fixed;
-        top: 1rem;
 
-        background-color: gainsboro;
+    #flash{
+      position: fixed;
+      top: 1px;         
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      max-width: 700px;
+      z-index: 99999;     
+      opacity: 1;
+      background: transparent;
     }
 
-    #flash:empty,
-    #flash:blank,
-    #flash:not(:has(*)):not(:empty) {
+    #flash .alert {
+        padding: 14px 16px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 500;
+        border: 1px solid transparent;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    #flash:empty {
         display: none;
     }
 </style>

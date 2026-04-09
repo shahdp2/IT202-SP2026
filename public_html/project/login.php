@@ -17,6 +17,13 @@ require(__DIR__ . "/../../partials/nav.php");
     function validate(form) {
         //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
         //ensure it returns false for an error and true for success
+        // UCID dns33
+        // Date 04/08/2026
+        let isValid = true;
+        if(!isValidPassword(pw)){
+            flash("Password must be atleast 8 characters.");
+            isValid = false;
+        }
 
         return true;
     }
