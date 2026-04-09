@@ -1,124 +1,139 @@
 <?php
-ob_start();// Temp fix to resolve output buffer issues that send the header() early that cause issues with the header("Location:...") below
-require(__DIR__ . "/../../partials/nav.php");
-?>
-<h3>Login</h3>
-<form onsubmit="return validate(this)" method="POST">
-    <div>
-        <label for="email">Email or Username</label>
-        <input id="email" type="text" name="email" required />
-    </div>
-    <div>
-        <label for="pw">Password</label>
-        <input type="password" id="pw" name="password" required minlength="8" />
-    </div>
-    <input type="submit" value="Login" />
-</form>
-<script>
-    function validate(form) {
-        //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
-        //ensure it returns false for an error and true for success
+//note we need to go up 1 more directory
+require(__DIR__ . "/../../../partials/nav.php");
 
-        return true;
-    }
-</script>
-<?php
-//TODO 2: add PHP Code
-if (isset($_POST["email"], $_POST["password"])) {
-    // still leveraging the property as "email", but it can be a username
-    $email = se($_POST, "email", "", false);
-    $password = se($_POST, "password", "", false);
-    // TODO 3: validate/use
-    $hasError = false;
-
-    if (empty($email)) {
-        flash("Email/Username must not be empty.", "danger");
-        $hasError = true;
-    }
-    if (str_contains($email, "@")) {
-        // if it contains an @, treat it as an email
-
-        // Sanitize and validate email
-        $email = sanitize_email($email);
-        if (!is_valid_email($email)) {
-            flash("Invalid email address.", "danger");
-            $hasError = true;
-        }
+if (!has_role("Admin")) {
+    flash("You don't have permission to view this page", "warning");
+    die(header("Location: " . get_url("landing.php")));
+}
+//attempt to apply
+if (isset($_POST["users"], $_POST["roles"])) {
+    $user_ids = $_POST["users"]; //se() doesn't like arrays so we'll just do this
+    $role_ids = $_POST["roles"]; //se() doesn't like arrays so we'll just do this
+    if (empty($user_ids) || empty($role_ids)) {
+        flash("Both users and roles need to be selected", "warning");
     } else {
-        // otherwise, treat it as a username
-        $email = strtolower(trim($email));
-        if (!is_valid_username($email)) {
-            flash("Username must be lowercase, alphanumerical, and can only contain _ or -", "danger");
-            $hasError = true;
-        }
-    }
-
-
-    if (empty($password)) {
-        flash("Password must not be empty.", "danger");
-        $hasError = true;
-    }
-
-    if (!is_valid_password($password)) {
-        //echo "Password too short<br>";
-        flash("Password must be at least 8 characters long.", "danger");
-        $hasError = true;
-    }
-
-    if (!$hasError) {
-
-
-        //TODO 4: Check password and fetch user
+        //for sake of simplicity, this will be a tad inefficient (normally bulk operations should fail/pass together)
         $db = getDB();
-        // fetch by email or username
-        $stmt = $db->prepare("SELECT id, email, password, username from Users where email = :email OR username = :email");
-        try {
-            $r = $stmt->execute([":email" => $email]);
-            if ($r) {
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                $ambigify = false; // flag to indicate ambiguous login attempt (reduce TMI)
-                if ($user) {
-                    $hash = $user["password"];
-                    unset($user["password"]);
-                    if (password_verify($password, $hash)) {
+        $stmt = $db->prepare("INSERT INTO UserRoles (user_id, role_id, is_active) VALUES (:uid, :rid, 1) 
+        ON DUPLICATE KEY UPDATE is_active = !is_active");
 
-                        $_SESSION["user"] = $user; // add the data to the active session
-                        try {
-                            //lookup potential roles
-                            $stmt = $db->prepare("SELECT Roles.name FROM Roles
-                                JOIN UserRoles on Roles.id = UserRoles.role_id
-                                where UserRoles.user_id = :user_id and Roles.is_active = 1 
-                                and UserRoles.is_active = 1");
-                            $stmt->execute([":user_id" => get_user_id()]);
-                            $roles = $stmt->fetchAll(PDO::FETCH_ASSOC); //fetch all since we'll want multiple
-                        } catch (Exception $e) {
-                            error_log(var_export($e, true));
-                        }
-                        //save roles or empty array
-                        $_SESSION["user"]["roles"] = isset($roles) ? $roles : [];
-
-                        die(header("Location: landing.php"));
+        // triggers 1 query per pair, that way an exception will only affect that pair rather than the bulk operation
+        foreach ($user_ids as $uid) {
+            foreach ($role_ids as $rid) {
+                try {
+                    $stmt->execute([":uid" => $uid, ":rid" => $rid]);
+                    if ($stmt->rowCount() > 0) {
+                        flash("Toggled role for user $uid and role $rid", "success");
                     } else {
-                        //echo "Invalid password<br>";
-                        $ambigify = true; // ambiguous login attempt
+                        flash("No changes made for user $uid and role $rid", "warning");
                     }
-                } else {
-                    //echo "Email not found<br>";
-                    $ambigify = true; // ambiguous login attempt
-                }
-                if ($ambigify) {
-                    flash("Invalid login attempt. Please check your email and password.", "danger");
+                } catch (PDOException $e) {
+                    flash("There was an error toggling the role, please try again later", "danger");
+                    error_log("Error toggling role for user $uid and role $rid: " . var_export($e->errorInfo, true));
                 }
             }
-        } catch (Exception $e) {
-            //echo "There was an error logging in<br>"; // user-friendly message
-            flash("There was an error logging in. Please try again later.", "danger");
-            error_log("Login Error: " . var_export($e, true)); // log the technical error for debugging
         }
     }
 }
+
+
+
+//search for user by username
+$users = [];
+$active_roles = [];
+$username = "";
+if (isset($_POST["username"])) {
+
+    $username = trim(se($_POST, "username", "", false));
+    if (!empty($username)) {
+        //get active roles only if a username was submitted
+        $active_roles = [];
+        $db = getDB();
+        $stmt = $db->prepare("SELECT id, name, description FROM Roles WHERE is_active = 1 LIMIT 10");
+        try {
+            $stmt->execute();
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if ($results) {
+                $active_roles = $results;
+            }
+        } catch (PDOException $e) {
+            flash(var_export($e->errorInfo, true), "danger");
+        }
+        //fetch usernames with a csv of roles and their active status
+        // Note: the role status will show inactive only if the role has been assigned at least once
+        // We're effectively doing a soft delete by toggling `is_active` to 0.
+        // Alternatively, we could simply delete the UserRole entry, but that would lose history.
+        $stmt = $db->prepare("SELECT Users.id, username, 
+        (SELECT GROUP_CONCAT(name, ' (' , IF(ur.is_active = 1,'active','inactive') , ')') from 
+        UserRoles ur 
+        JOIN Roles on ur.role_id = Roles.id 
+        WHERE ur.user_id = Users.id) as roles
+        from Users WHERE username like :username");
+        try {
+            $stmt->execute([":username" => "%$username%"]);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if ($results) {
+                $users = $results;
+            }
+        } catch (PDOException $e) {
+            flash(var_export($e->errorInfo, true), "danger");
+        }
+    } else {
+        flash("Username must not be empty", "warning");
+    }
+}
+
+
 ?>
+<h3>Assign Roles</h3>
+<!-- search form -->
+<form method="POST">
+    <input type="search" name="username" placeholder="Username search" value="<?php se($username, false); ?>" />
+    <input type="submit" value="Search" />
+</form>
+<!-- empty toggle form, inputs will use the form attribute to associate with this form -->
+<form id="toggleForm" method="POST"></form>
+<?php if (isset($username) && !empty($username)) : ?>
+    <input form="toggleForm" type="hidden" name="username" value="<?php se($username, false); ?>" />
+<?php endif; ?>
+<table>
+    <thead>
+        <th>Users</th>
+        <th>Roles to Assign</th>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <!-- nested table for users -->
+                <table>
+                    <?php foreach ($users as $user) : ?>
+                        <tr>
+                            <td>
+
+                                <input form="toggleForm" id="user_<?php se($user, 'id'); ?>" type="checkbox" name="users[]" value="<?php se($user, 'id'); ?>" />
+                                <label form="toggleForm" for="user_<?php se($user, 'id'); ?>"><?php se($user, "username"); ?></label>
+                            </td>
+                            <td><?php se($user, "roles", "No Roles"); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            </td>
+            <td>
+                <!-- nested data for roles -->
+                <?php foreach ($active_roles as $role) : ?>
+                    <div>
+                        <input form="toggleForm" id="role_<?php se($role, 'id'); ?>" type="checkbox" name="roles[]" value="<?php se($role, 'id'); ?>" />
+                        <label form="toggleForm" for="role_<?php se($role, 'id'); ?>"><?php se($role, "name"); ?></label>
+                    </div>
+                <?php endforeach; ?>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<input form="toggleForm" type="submit" value="Toggle Roles" />
 
 <?php
-require(__DIR__ . "/../../partials/flash.php");
+//note we need to go up 1 more directory
+require_once(__DIR__ . "/../../../partials/flash.php");
 ?>

@@ -2,14 +2,15 @@
 require(__DIR__ . "/../../partials/nav.php");
 ?>
 <h3>Register</h3>
+
 <form onsubmit="return validate(this)" method="POST">
     <div>
         <label for="email">Email</label>
-        <input id="email" type="email" name="email" required />
+        <input id="email" type="email" name="email" required value="<?php se($_POST,'email'); ?>" />
     </div>
     <div>
         <label for="username">Username</label>
-        <input type="text" name="username" required maxlength="30" />
+        <input type="text" name="username" required maxlength="30" value="<?php se($_POST,'username'); ?>"/>
     </div>
     <div>
         <label for="pw">Password</label>
@@ -22,12 +23,26 @@ require(__DIR__ . "/../../partials/nav.php");
     <input type="submit" value="Register" />
 </form>
 <script>
-    function validate(form) {
-        //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
-        //ensure it returns false for an error and true for success
+  function validate(form) {
+    // UCID dns33
+    // Date 04/08/2026
+    // Summary: Client-side password length + match check
 
-        return true;
+    const pw = form.password.value;      // name="password"
+    const confirm = form.confirm.value;  // name="confirm"
+
+    if (pw.length < 8) {
+      alert("Password must be at least 8 characters.");
+      return false;
     }
+
+    if (pw !== confirm) {
+      alert("Passwords must match.");
+      return false;
+    }
+
+    return true;
+  }
 </script>
 <?php
 //TODO 2: add PHP Code
