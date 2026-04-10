@@ -29,6 +29,10 @@ require(__DIR__ . "/../../partials/nav.php");
     }
 </script>
 <?php
+ob_start();
+require(__DIR__ . "/../../partials/nav.php");
+?>
+<?php
 //TODO 2: add PHP Code
 if (isset($_POST["email"], $_POST["password"])) {
 
@@ -90,7 +94,8 @@ if (isset($_POST["email"], $_POST["password"])) {
                             //save roles or empty array
                             $_SESSION["user"]["roles"] = isset($roles)?$roles:[];
                            
-                            die(header("Location: landing.php"));
+                            header("Location: " . get_url("landing.php"));
+                            exit;
                         } else {
                             //echo "Invalid password<br>";
                             $ambigify = true; // ambiguous login attempt
