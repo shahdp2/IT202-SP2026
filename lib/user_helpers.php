@@ -5,10 +5,6 @@
  * @param string $destination The destination to redirect to if not logged in (relative to BASE_PATH or absolute).
  * @return bool True if the user is logged in, false otherwise.
  */
-/* 
-    UCID dns33
-    date 04/09/2026
-*/
 function is_logged_in($redirect = false, $destination = "login.php")
 {
     $isLoggedIn = isset($_SESSION["user"]);
@@ -32,7 +28,6 @@ function has_role($role)
     }
     return false;
 }
-
 function get_username()
 {
     if (is_logged_in()) { //we need to check for login first because "user" key may not exist
