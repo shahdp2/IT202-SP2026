@@ -3,41 +3,61 @@ require(__DIR__ . "/../../partials/nav.php");
 ?>
 <h3>Register</h3>
 
-<form onsubmit="return validate(this)" method="POST">
-    <div>
-        <label for="email">Email</label>
-        <input id="email" type="email" name="email" required value="<?php se($_POST,'email'); ?>" />
-    </div>
-    <div>
-        <label for="username">Username</label>
-        <input type="text" name="username" required maxlength="30" value="<?php se($_POST,'username'); ?>"/>
-    </div>
-    <div>
-        <label for="pw">Password</label>
-        <input type="password" id="pw" name="password" required minlength="8" />
-    </div>
-    <div>
-        <label for="confirm">Confirm</label>
-        <input type="password" name="confirm" required minlength="8" />
-    </div>
-    <input type="submit" value="Register" />
+<!-- UCID: dns33 | Date: 04/10/2026 | JS validation -->
+<form method="POST" onsubmit="return validate(this);">
+  <div>
+    <label for="email">Email</label>
+    <input id="email" type="email" name="email" required value="<?php se($_POST,'email'); ?>" />
+  </div>
+
+  <div>
+    <label for="username">Username</label>
+    <input id="username" type="text" name="username" required maxlength="30" value="<?php se($_POST,'username'); ?>" />
+  </div>
+
+  <div>
+    <label for="pw">Password</label>
+    <input id="pw" type="password" name="password" required minlength="8" />
+  </div>
+
+  <div>
+    <label for="confirm">Confirm</label>
+    <input id="confirm" type="password" name="confirm" required minlength="8" />
+  </div>
+
+  <input type="submit" value="Register" />
 </form>
 <script>
+  // UCID: dns33 | Date: 04/10/2026
+  // Summary: Client-side validation for email, username, password, confirm match
   function validate(form) {
-    // UCID dns33
-    // Date 04/08/2026
-    // Summary: Client-side password length + match check
+    const email = form.email.value.trim();
+    const username = form.username.value.trim();
+    const pw = form.password.value;
+    const confirm = form.confirm.value;
 
-    const pw = form.password.value;      // name="password"
-    const confirm = form.confirm.value;  // name="confirm"
-
-    if (pw.length < 8) {
-      alert("Password must be at least 8 characters.");
+    // 1) email format
+    if (!email.includes("@") || !email.includes(".")) {
+      flash("Email format is invalid. Example: user@example.com");
       return false;
     }
 
+    // 2) username format: lowercase + numbers + _ or -
+    const userRegex = /^[a-z0-9_-]+$/;
+    if (!userRegex.test(username)) {
+      flash("Username must be lowercase and only contain letters, numbers, _ or -");
+      return false;
+    }
+
+    // 3) password format (length)
+    if (pw.length < 8) {
+      flash("Password must be at least 8 characters.");
+      return false;
+    }
+
+    // 4) confirm match
     if (pw !== confirm) {
-      alert("Passwords must match.");
+      flash("Password and Confirm must match.");
       return false;
     }
 
@@ -45,6 +65,9 @@ require(__DIR__ . "/../../partials/nav.php");
   }
 </script>
 <?php
+// UCID: dns33
+// Date: 04/10/2026
+// Summary: Server-side validation + insert + duplicate handling
 //TODO 2: add PHP Code
 if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["username"])) {
 
@@ -112,5 +135,4 @@ if (isset($_POST["email"], $_POST["password"], $_POST["confirm"], $_POST["userna
 ?>
 <?php
 require(__DIR__ . "/../../partials/flash.php");
-reset_session();
 ?>
