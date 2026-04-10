@@ -5,7 +5,7 @@ require(__DIR__ . "/../../partials/nav.php");
 <form onsubmit="return validate(this)" method="POST">
     <div>
         <label for="email">Email</label>
-        <input id="email" type="email" name="email" required value="<?php se($_POST, 'email'); ?>" />
+        <input id="email" type="email" name="email" required " />
     </div>
     <div>
         <label for="pw">Password</label>
@@ -94,8 +94,8 @@ if (isset($_POST["email"], $_POST["password"])) {
                             //save roles or empty array
                             $_SESSION["user"]["roles"] = isset($roles)?$roles:[];
                            
-                            header("Location: " . get_url("landing.php"));
-                            exit;
+                            die(header("Location: landing.php"));
+                            
                         } else {
                             //echo "Invalid password<br>";
                             $ambigify = true; // ambiguous login attempt
