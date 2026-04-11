@@ -5,15 +5,17 @@
  * @param string $destination The destination to redirect to if not logged in (relative to BASE_PATH or absolute).
  * @return bool True if the user is logged in, false otherwise.
  */
+/* UCID dns33 | date 04/10/2026 */
 function is_logged_in($redirect = false, $destination = "login.php")
 {
     $isLoggedIn = isset($_SESSION["user"]);
+
     if ($redirect && !$isLoggedIn) {
-        //if this triggers, the calling script won't receive a reply since die()/exit() terminates it
         flash("You must be logged in to view this page", "warning");
         $path = get_url($destination);
 
-        die(header("Location: $path"));
+        header("Location: $path");
+        exit; 
     }
     return $isLoggedIn;
 }
