@@ -1,8 +1,5 @@
 <?php
-require_once(__DIR__ . "/../../lib/functions.php");
-is_logged_in(true, "login.php");
-
-require_once(__DIR__ . "/../../partials/nav.php");
+require(__DIR__ . "/../../partials/nav.php");
 error_log("Session: " . var_export($_SESSION, true));
 ?>
 <h1>Landing Page</h1>
