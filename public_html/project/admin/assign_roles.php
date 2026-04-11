@@ -1,6 +1,15 @@
 <?php
 //note we need to go up 1 more directory
-require(__DIR__ . "/../../../partials/nav.php");
+require_once(__DIR__ . "/../../../lib/functions.php");
+is_logged_in(true, "login.php");
+
+if (!has_role("Admin")) {
+    flash("You don't have permission to view this page", "warning");
+    header("Location: " . get_url("landing.php"));
+    exit;
+}
+
+require_once(__DIR__ . "/../../../partials/nav.php");
 
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
