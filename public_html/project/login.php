@@ -1,12 +1,13 @@
 <?php
-ob_start();// Temp fix to resolve output buffer issues that send the header() early that cause issues with the header("Location:...") below
+ob_start();
 require(__DIR__ . "/../../partials/nav.php");
 ?>
 <h3>Login</h3>
+<!--  UCID dns33  date 04/10/2026 -->
 <form onsubmit="return validate(this)" method="POST">
     <div>
         <label for="email">Email or Username</label>
-        <input id="email" type="text" name="email" required />
+        <input id="email" type="text" name="email" required value="<?php se($_POST,'email'); ?>" />
     </div>
     <div>
         <label for="pw">Password</label>
@@ -15,13 +16,61 @@ require(__DIR__ . "/../../partials/nav.php");
     <input type="submit" value="Login" />
 </form>
 <script>
-    function validate(form) {
-        //TODO 1: implement JavaScript validation (you'll do this on your own towards the end of Milestone1)
-        //ensure it returns false for an error and true for success
+  // UCID: dns33 | Date: 04/10/2026
+  // Summary: Client-side validation for login (email/username + password length)
 
-        return true;
+  function showMsg(message, color = "warning") {
+    const flash = document.getElementById("flash");
+    if (!flash) return;
+
+    // clear old messages so they don't stack
+    flash.innerHTML = "";
+
+    const outerDiv = document.createElement("div");
+    outerDiv.className = "row justify-content-center";
+
+    const innerDiv = document.createElement("div");
+    innerDiv.className = `alert alert-${color}`;
+    innerDiv.innerText = message;
+
+    outerDiv.appendChild(innerDiv);
+    flash.appendChild(outerDiv);
+  }
+
+  function validate(form) {
+    const login = form.email.value.trim();      // "Email or Username" input
+    const pw = form.password.value;
+
+    // password format
+    if (pw.length < 8) {
+      showMsg("Password must be at least 8 characters.", "warning");
+      return false;
     }
+
+    // Decide: email vs username
+    const looksLikeEmail = login.includes("@");
+
+    // email format
+    if (looksLikeEmail) {
+      // simple email check good enough for JS layer
+      if (!login.includes(".") || login.startsWith("@") || login.endsWith("@")) {
+        showMsg("Email format is invalid. Example: user@example.com", "warning");
+        return false;
+      }
+    } else {
+      // username format
+      const userRegex = /^[a-z0-9_-]+$/;
+      if (!userRegex.test(login)) {
+        showMsg("Username must be lowercase and only contain letters, numbers, _ or -.", "warning");
+        return false;
+      }
+    }
+
+    return true;
+  }
 </script>
+
+// UCID dns33 | date 04/10/2026
 <?php
 //TODO 2: add PHP Code
 if (isset($_POST["email"], $_POST["password"])) {
