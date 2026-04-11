@@ -3,6 +3,7 @@ ob_start();
 require_once(__DIR__ . "/../../partials/nav.php");
 is_logged_in(true); // redirects to login.php with flash if not logged in
 ?>
+<!-- UCID dns33 | date 04/11/2026 -->
 <?php
 $user_id = get_user_id(); // get id from session
 $email = get_user_email(); // get email from session
@@ -152,6 +153,7 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
 }
 ?>
 <h3>Profile</h3>
+<!-- UCID dns33 | date 04/11/2026  -->
 <form method="POST" onsubmit="return validate(this);">
     <div class="mb-3">
         <label for="email">Email</label>
@@ -179,53 +181,62 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
 </form>
 
 <script>
+//   UCID: dns33
+//   Date: 04/11/2026
+  // Summary: JS validation for email/username format and optional password change rules
   function validate(form) {
-    // UCID dns33 date 04/09/2026
-    let email = form.email.value.trim();
-    let username = form.username.value.trim();
+    const email = form.email?.value.trim() || "";
+    const username = form.username?.value.trim() || "";
 
-    let pw = form.newPassword.value.trim();
-    let con = form.confirmPassword.value.trim();
-    let cp = form.currentPassword.value.trim();
+    const pw = form.newPassword?.value.trim() || "";
+    const con = form.confirmPassword?.value.trim() || "";
+    const cp = form.currentPassword?.value.trim() || "";
 
-    let flash = document.getElementById("flash");
+    const flash = document.getElementById("flash");
     if (flash) flash.innerHTML = "";
 
     function showMsg(message) {
       if (!flash) return;
-      let outerDiv = document.createElement("div");
+      const outerDiv = document.createElement("div");
       outerDiv.className = "row justify-content-center";
-      let innerDiv = document.createElement("div");
+
+      const innerDiv = document.createElement("div");
       innerDiv.className = "alert alert-warning";
       innerDiv.innerText = message;
+
       outerDiv.appendChild(innerDiv);
       flash.appendChild(outerDiv);
     }
 
-    if (!email.includes("@") || !email.includes(".")) {
+    // Email check (simple but decent)
+    if (!email || !email.includes("@") || email.lastIndexOf(".") < email.indexOf("@") + 2) {
       showMsg("Email must be a valid email address.");
       return false;
     }
 
-    let userRegex = /^[a-z0-9_-]+$/;
-    if (!userRegex.test(username)) {
+    // Username check
+    const userRegex = /^[a-z0-9_-]+$/;
+    if (!username || !userRegex.test(username)) {
       showMsg("Username must be lowercase and can only contain letters, numbers, _ or -.");
       return false;
     }
 
+    // If not changing password, allow submit
     if (!pw && !con && !cp) return true;
 
-    // Password checks only when trying to change password
+    // If trying to change password, require all 3
     if (!cp || !pw || !con) {
       showMsg("To change your password, fill Current Password, New Password, and Confirm Password.");
       return false;
     }
 
+    // Password length
     if (pw.length < 8) {
       showMsg("New password must be at least 8 characters.");
       return false;
     }
 
+    // Confirm match
     if (pw !== con) {
       showMsg("New Password and Confirm password must match.");
       return false;
