@@ -70,7 +70,7 @@ require(__DIR__ . "/../../partials/nav.php");
   }
 </script>
 
-// UCID dns33 | date 04/10/2026
+<!-- UCID dns33 | date 04/10/2026 -->
 <?php
 //TODO 2: add PHP Code
 if (isset($_POST["email"], $_POST["password"])) {
