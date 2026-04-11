@@ -1,8 +1,8 @@
 <?php
-require_once(__DIR__ . "/../../lib/functions.php");
-is_logged_in(true, "login.php"); // redirects before any HTML
-
 require_once(__DIR__ . "/../../partials/nav.php");
+if (!is_logged_in()) {
+    die(header("Location: login.php"));
+}
 ?>
 <?php
 $user_id = get_user_id(); // get id from session
