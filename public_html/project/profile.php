@@ -1,8 +1,7 @@
 <?php
+ob_start();
 require_once(__DIR__ . "/../../partials/nav.php");
-if (!is_logged_in()) {
-    die(header("Location: login.php"));
-}
+is_logged_in(true); // redirects to login.php with flash if not logged in
 ?>
 <?php
 $user_id = get_user_id(); // get id from session

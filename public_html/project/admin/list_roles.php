@@ -1,12 +1,15 @@
 <?php
-//note we need to go up 1 more directory
+ob_start();
 require(__DIR__ . "/../../../partials/nav.php");
+
+is_logged_in(true); // must be logged in first
 
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
-    die(header("Location: " . get_url("landing.php")));
+    header("Location: " . get_url("landing.php"));
+    exit;
 }
-//handle the toggle first so SELECT pulls fresh data
+
 if (isset($_POST["role_id"])) {
     $role_id = se($_POST, "role_id", "", false);
     if (!empty($role_id)) {
