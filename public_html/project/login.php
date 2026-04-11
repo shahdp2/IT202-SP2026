@@ -16,8 +16,8 @@ require(__DIR__ . "/../../partials/nav.php");
     <input type="submit" value="Login" />
 </form>
 <script>
-  // UCID: dns33 | Date: 04/10/2026
-  // Summary: Client-side validation for login (email/username + password length)
+//   UCID: dns33 | Date: 04/10/2026
+//   Summary: Client-side validation for login (email/username + password length)
 
   function showMsg(message, color = "warning") {
     const flash = document.getElementById("flash");
