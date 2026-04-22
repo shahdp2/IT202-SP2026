@@ -48,7 +48,7 @@ function yt_transform_channel($apiJson, $channelId)
  * Extract video rows for IT202_M2_YT_Videos from API decoded JSON.
  * Only grabs items that actually contain ["video"].
  * dns33
- * /
+ */
 function yt_transform_videos($apiJson, $channelId)
 {
     $rows = [];
