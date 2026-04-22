@@ -29,7 +29,8 @@ function yt_pick_best_thumbnail($thumbnails)
  * Extract a channel row for IT202_M2_YT_Channels from API decoded JSON.
  * NOTE: channel_id is NOT always returned by some endpoints. If your endpoint
  * doesn’t return it, we store the one you searched with.
- */
+ * dns33
+*/
 function yt_transform_channel($apiJson, $channelId)
 {
     return [
@@ -46,7 +47,8 @@ function yt_transform_channel($apiJson, $channelId)
 /**
  * Extract video rows for IT202_M2_YT_Videos from API decoded JSON.
  * Only grabs items that actually contain ["video"].
- */
+ * dns33
+ * /
 function yt_transform_videos($apiJson, $channelId)
 {
     $rows = [];
