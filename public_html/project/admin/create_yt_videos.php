@@ -1,7 +1,7 @@
 <?php
 // UCID: dns33
 // Date: 04/19/2026
-// Summary: Admin fetch/create videos (API fetch inserts multiple; manual create inserts one). Handles duplicates safely.
+// Summary: Admin Create/Fetch YouTube Videos (multiple entities) following create_company.php template.
 
 require(__DIR__ . "/../../../partials/nav.php");
 
@@ -10,109 +10,85 @@ if (!has_role("Admin")) {
     die(header("Location:" . get_url("landing.php")));
 }
 
-$db = getDB();
-
 if (isset($_POST["action"])) {
     $action = se($_POST, "action", "", false);
     $videos = [];
 
     if ($action === "fetch") {
         $channelId = trim(se($_POST, "channel_id", "", false));
-        $query = trim(se($_POST, "query", "", false));
-        $next = trim(se($_POST, "next", "", false));
+        $query     = trim(se($_POST, "query", "", false));
+        $next      = trim(se($_POST, "next", "", false));
 
-        if (empty($channelId) || empty($query)) {
-            flash("Channel ID and Query are required", "warning");
-        } else {
-            $api = yt_channel_search($channelId, $query, $next);
-            $videos = yt_transform_videos($api, $channelId);
+        if ($channelId && $query) {
+            $bundle = yt_channel_search($channelId, $query, $next);
 
-            if (count($videos) === 0) {
-                flash("No videos found from API", "warning");
-            } else {
-                flash("Fetched " . count($videos) . " videos from API", "success");
+            // IMPORTANT: yt_channel_search returns ["videos"=> already transformed rows]
+            $videos = se($bundle, "videos", [], false);
+
+            error_log("YT videos from API: " . var_export($videos, true));
+
+            if (!$videos) {
+                flash("No videos returned from API", "warning");
             }
+        } else {
+            flash("You must provide Channel ID and Query", "warning");
         }
-    }
 
-    if ($action === "create") {
-        // Whitelist ONLY your table columns (no id/created/modified)
-        $allowed = ["video_id","channel_id","title","channel_name","length_text","published_text","views_text","thumbnail_url"];
+    } elseif ($action === "create") {
 
         foreach ($_POST as $k => $v) {
-            if (!in_array($k, $allowed) && $k !== "action") {
+            if (!in_array($k, ["video_id","channel_id","title","channel_name","length_text","published_text","views_text","thumbnail_url"])) {
                 unset($_POST[$k]);
             }
         }
 
-        // mark manual record
         $_POST["is_api"] = 0;
+        $videos = [$_POST]; // wrap single record like company template
 
-        // wrap single record so insert loop works same as fetch
-        $videos = [$_POST];
-
-        if (empty(se($_POST, "video_id", "", false)) || empty(se($_POST, "channel_id", "", false))) {
+        if (empty(se($_POST, "video_id", "", false)) || empty(se($_POST, "channel_id", "", false)) || empty(se($_POST, "title", "", false))) {
             $videos = [];
-            flash("Manual create requires Video ID and Channel ID", "warning");
+            flash("Manual create requires Video ID, Channel ID, and Title", "warning");
         }
+
+        error_log("Manual video: " . var_export($videos, true));
     }
 
-    // ---- INSERT (works for both fetch/create) ----
+    // INSERT (like company template)
     if (count($videos) > 0) {
-        // Build INSERT from first record (must match table columns)
-        $query = "INSERT INTO IT202_M2_YT_Videos ";
+        $db = getDB();
+
+        $querySql = "INSERT INTO `IT202_M2_YT_Videos` ";
         $columns = [];
         $params = [];
 
+        // build from first record
         foreach ($videos[0] as $k => $v) {
-            // safety: only allow known columns
-            if (!in_array($k, ["video_id","channel_id","title","channel_name","length_text","published_text","views_text","thumbnail_url","is_api"])) {
-                continue;
-            }
             $columns[] = "`$k`";
             $params[":$k"] = null;
         }
 
-        $query .= "(" . join(",", $columns) . ") VALUES (" . join(",", array_keys($params)) . ")";
+        $querySql .= "(" . join(",", $columns) . ")";
+        $querySql .= " VALUES (" . join(",", array_keys($params)) . ")";
 
-        // Handle duplicates (video_id UNIQUE)
-        // If duplicate, update fields + modified timestamp automatically updates
-        $query .= " ON DUPLICATE KEY UPDATE
-            `title` = VALUES(`title`),
-            `channel_name` = VALUES(`channel_name`),
-            `length_text` = VALUES(`length_text`),
-            `published_text` = VALUES(`published_text`),
-            `views_text` = VALUES(`views_text`),
-            `thumbnail_url` = VALUES(`thumbnail_url`),
-            `is_api` = VALUES(`is_api`)";
-
-        $stmt = $db->prepare($query);
-
-        $inserted = 0;
-        $updated = 0;
-
-        foreach ($videos as $v) {
-            foreach ($params as $pk => $_) {
-                $col = substr($pk, 1);
-                $params[$pk] = se($v, $col, null, false);
+        foreach ($videos as $vid) {
+            foreach ($vid as $k => $v) {
+                $params[":$k"] = $v;
             }
+
+            error_log("Query: " . $querySql);
+            error_log("Params: " . var_export($params, true));
 
             try {
+                $stmt = $db->prepare($querySql);
                 $stmt->execute($params);
-
-                // rowCount() with ON DUPLICATE KEY can be 1 (insert) or 2 (update), depending on MySQL settings
-                $rc = $stmt->rowCount();
-                if ($rc === 1) $inserted++;
-                else if ($rc >= 2) $updated++;
-
+                flash("Inserted record " . $db->lastInsertId(), "success");
             } catch (PDOException $e) {
-                error_log("YT insert error: " . var_export($e, true));
-                flash("A DB error occurred inserting videos", "danger");
-                break;
+                error_log("YT Video insert error: " . var_export($e, true));
+                flash("Insert failed (likely duplicate video_id).", "danger");
             }
         }
-
-        flash("Done. Inserted: $inserted, Updated (duplicates): $updated", "success");
+    } else {
+        flash("No video fetched or provided", "warning");
     }
 }
 ?>
@@ -122,10 +98,10 @@ if (isset($_POST["action"])) {
 
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link bg-success" href="#" onclick="switchTab('fetch'); return false;">Fetch (API)</a>
+            <a class="nav-link bg-success" href="#" onclick="switchTab('fetch'); return false;">Fetch</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link bg-success" href="#" onclick="switchTab('create'); return false;">Create (Manual)</a>
+            <a class="nav-link bg-success" href="#" onclick="switchTab('create'); return false;">Create</a>
         </li>
     </ul>
 
@@ -147,7 +123,7 @@ if (isset($_POST["action"])) {
             </div>
 
             <input type="hidden" name="action" value="fetch">
-            <input type="submit" value="Fetch Videos" class="btn btn-primary">
+            <input type="submit" value="Fetch & Save" class="btn btn-primary">
         </form>
     </div>
 
@@ -160,7 +136,7 @@ if (isset($_POST["action"])) {
 
             <div class="mb-3">
                 <label for="channel_id2">Channel ID</label>
-                <input type="text" name="channel_id" id="channel_id2" required placeholder="MANUAL_CH_001 or real UC...">
+                <input type="text" name="channel_id" id="channel_id2" required placeholder="MANUAL_CH_001">
             </div>
 
             <div class="mb-3">
@@ -175,17 +151,17 @@ if (isset($_POST["action"])) {
 
             <div class="mb-3">
                 <label for="length_text">Length</label>
-                <input type="text" name="length_text" id="length_text" maxlength="20" placeholder="4:37">
+                <input type="text" name="length_text" id="length_text" maxlength="20">
             </div>
 
             <div class="mb-3">
                 <label for="published_text">Published</label>
-                <input type="text" name="published_text" id="published_text" maxlength="30" placeholder="1 year ago">
+                <input type="text" name="published_text" id="published_text" maxlength="30">
             </div>
 
             <div class="mb-3">
                 <label for="views_text">Views</label>
-                <input type="text" name="views_text" id="views_text" maxlength="40" placeholder="6,965 views">
+                <input type="text" name="views_text" id="views_text" maxlength="40">
             </div>
 
             <div class="mb-3">
@@ -194,7 +170,7 @@ if (isset($_POST["action"])) {
             </div>
 
             <input type="hidden" name="action" value="create">
-            <input type="submit" value="Create Video" class="btn btn-primary">
+            <input type="submit" value="Create" class="btn btn-primary">
         </form>
     </div>
 </div>
@@ -202,8 +178,8 @@ if (isset($_POST["action"])) {
 <script>
 function switchTab(tab) {
     let targets = document.getElementsByClassName("tab-target");
-    for (let t of targets) {
-        t.style.display = (t.id === tab) ? "block" : "none";
+    for (let ele of targets) {
+        ele.style.display = (ele.id === tab) ? "block" : "none";
     }
 }
 </script>
