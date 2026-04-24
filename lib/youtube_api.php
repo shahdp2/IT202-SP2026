@@ -128,6 +128,9 @@ function yt_channel_search($channelId, $query, $next = "")
         return ["raw" => [], "channel" => [], "videos" => []];
     }
 
+    error_log("YT decoded json keys: " . implode(", ", array_keys($json)));
+    error_log("YT decoded json sample: " . substr(json_encode($json), 0, 500));
+
     return [
         "raw" => $json,
         "channel" => yt_transform_channel($json, $channelId),
