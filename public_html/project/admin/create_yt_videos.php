@@ -45,9 +45,14 @@ if (isset($_POST["action"])) {
         $_POST["is_api"] = 0;
         $videos = [$_POST]; // wrap single record like company template
 
-        if (empty(se($_POST, "video_id", "", false)) || empty(se($_POST, "channel_id", "", false)) || empty(se($_POST, "title", "", false))) {
+        $video_id     = trim(se($_POST, "video_id", "", false));
+        $channel_id   = trim(se($_POST, "channel_id", "", false));
+        $title        = trim(se($_POST, "title", "", false));
+        $channel_name = trim(se($_POST, "channel_name", "", false)); // include this if your form has it
+        
+        if ($video_id === "" || $channel_id === "" || $title === "" || $channel_name === "") {
             $videos = [];
-            flash("Manual create requires Video ID, Channel ID, and Title", "warning");
+            flash("Manual create requires Video ID, Channel ID, Title, and Channel Name", "warning");
         }
 
         error_log("Manual video: " . var_export($videos, true));
@@ -128,7 +133,7 @@ if (isset($_POST["action"])) {
     </div>
 
     <div id="create" style="display:none;" class="tab-target">
-        <form method="POST">
+        <form method="POST" onsubmit="return validateVideoForm();">
             <div class="mb-3">
                 <label for="video_id">Video ID</label>
                 <input type="text" name="video_id" id="video_id" required placeholder="c80ELNJ0LJE">
@@ -176,11 +181,27 @@ if (isset($_POST["action"])) {
 </div>
 
 <script>
+// UCID: dns33
 function switchTab(tab) {
     let targets = document.getElementsByClassName("tab-target");
     for (let ele of targets) {
         ele.style.display = (ele.id === tab) ? "block" : "none";
     }
+}
+
+function validateVideoForm() {
+
+  const videoId = document.getElementById("video_id")?.value?.trim() || "";
+
+  if (videoId.length < 6) {
+
+    alert("Video ID must be at least 6 characters.");
+
+    return false;
+
+  }
+
+  return true;
 }
 </script>
 
