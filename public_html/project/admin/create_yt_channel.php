@@ -27,7 +27,7 @@ if (isset($_POST["action"])) {
 
             error_log("YT bundle: " . var_export($bundle, true));
 
-            $channel = (isset($result["channel"]) && is_array($result["channel"])) ? $result["channel"] : [];
+            $channel = (isset($bundle["channel"]) && is_array($bundle["channel"])) ? $bundle["channel"] : [];
             if ($channel) {
                 $channel["is_api"] = 1; // already true in transform, safe
             } else {
