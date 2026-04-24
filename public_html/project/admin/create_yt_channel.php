@@ -165,6 +165,7 @@ if (isset($_POST["action"])) {
 </div>
 
 <script>
+// UCID: dns33
 function switchTab(tab) {
     let targets = document.getElementsByClassName("tab-target");
     for (let ele of targets) {
