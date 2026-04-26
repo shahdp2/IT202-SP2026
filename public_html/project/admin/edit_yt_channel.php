@@ -27,6 +27,50 @@ if ($id > 0 && isset($_POST["title"])) {
     $_POST["verified"] = isset($_POST["verified"]) ? 1 : 0;
     $_POST["is_api"] = isset($_POST["is_api"]) ? 1 : 0;
 
+
+    // ---- PHP validation (server-side) ----
+    $title = trim(se($_POST, "title", "", false));
+    $vanity = trim(se($_POST, "vanity_url", "", false));
+    $avatar = trim(se($_POST, "avatar_url", "", false));
+    
+    $hasError = false;
+    
+    // Title must not be blank (spaces should fail) and must be at least 3 chars
+    if ($title === "" || strlen($title) < 3) {
+        flash("Title must be at least 3 characters (PHP validation).", "danger");
+        $hasError = true;
+    }
+    
+    // If URLs are provided, require https://
+    if (!$hasError && $vanity !== "" && stripos($vanity, "https://") !== 0) {
+        flash("Vanity URL must start with https:// (PHP validation).", "danger");
+        $hasError = true;
+    }
+    
+    if (!$hasError && $avatar !== "" && stripos($avatar, "https://") !== 0) {
+        flash("Avatar URL must start with https:// (PHP validation).", "danger");
+        $hasError = true;
+    }
+    
+    if ($hasError) {
+        // stop update() from running
+    } else {
+        // required for update() WHERE clause
+        $_POST["id"] = $id;
+    
+        try {
+            $r = update("IT202_M2_YT_Channels", $_POST);
+            if ($r["rowCount"]) {
+                flash("Updated " . $r["rowCount"] . " record(s)", "success");
+            } else {
+                flash("No changes made (or same values submitted)", "warning");
+            }
+        } catch (Exception $e) {
+            error_log("YT channel update error: " . var_export($e, true));
+            flash("Error updating channel", "danger");
+        }
+    }
+
     // required for update() WHERE clause
     $_POST["id"] = $id;
 
