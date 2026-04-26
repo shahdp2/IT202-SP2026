@@ -32,38 +32,46 @@ try {
 }
 ?>
 <div class="container-fluid">
-    <h3>List YouTube Videos</h3>
+  <h3>List YouTube Videos</h3>
 
-    <?php if (count($results) == 0) : ?>
-        <p>No results to show</p>
-    <?php else : ?>
-        <table class="table">
+  <?php if (count($results) == 0) : ?>
+    <p>No results to show</p>
+  <?php else : ?>
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
             <?php foreach ($results as $index => $record) : ?>
-                <?php if ($index == 0) : ?>
-                    <thead>
-                        <?php foreach ($record as $column => $value) : ?>
-                            <th><?php se($column); ?></th>
-                        <?php endforeach; ?>
-                        <th>Actions</th>
-                    </thead>
-                <?php endif; ?>
-
-                <tr>
+              <?php if ($index == 0) : ?>
+                <thead>
+                  <tr>
                     <?php foreach ($record as $column => $value) : ?>
-                        <td><?php se($value, null, "N/A"); ?></td>
+                      <th><?php se($column); ?></th>
                     <?php endforeach; ?>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+              <?php endif; ?>
 
-                    <td>
-                        <a href="<?php echo get_url("admin/view_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">View</a>
-                        |
-                        <a href="<?php echo get_url("admin/edit_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">Edit</a>
-                        |
-                        <a href="<?php echo get_url("admin/delete_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">Delete</a>
-                    </td>
-                </tr>
+              <tr>
+                <?php foreach ($record as $column => $value) : ?>
+                  <td><?php se($value, null, "N/A"); ?></td>
+                <?php endforeach; ?>
+
+                <td class="actions">
+                  <a href="<?php echo get_url("admin/view_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">View</a>
+                  <a href="<?php echo get_url("admin/edit_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">Edit</a>
+                  <a href="<?php echo get_url("admin/delete_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">Delete</a>
+                </td>
+              </tr>
+
             <?php endforeach; ?>
-        </table>
-    <?php endif; ?>
+                </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
 </div>
-
 <?php require_once(__DIR__ . "/../../../partials/flash.php"); ?>
