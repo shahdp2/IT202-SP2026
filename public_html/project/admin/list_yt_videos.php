@@ -62,7 +62,8 @@ try {
                 <td class="actions">
                   <a href="<?php echo get_url("admin/view_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">View</a>
                   <a href="<?php echo get_url("admin/edit_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">Edit</a>
-                  <a href="<?php echo get_url("admin/delete_yt_video.php"); ?>?id=<?php se($record, "id"); ?>">Delete</a>
+                  <a href="<?php echo get_url("admin/delete_yt_video.php", true); ?>?id=<?php se($record, "id"); ?>
+                  &return=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">Delete</a>
                 </td>
               </tr>
 
