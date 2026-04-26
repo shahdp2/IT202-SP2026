@@ -68,7 +68,7 @@ if ($id > 0) {
 
     <p><b>Channel ID (read-only):</b> <?php se($channel, "channel_id"); ?></p>
 
-    <form method="POST">
+    <form method="POST" onsubmit="return validateChannelEdit(this);">
         <div class="mb-3">
             <label for="title">Title</label>
             <input type="text" name="title" id="title" required maxlength="120" value="<?php se($channel, "title"); ?>">
@@ -106,5 +106,54 @@ if ($id > 0) {
         <input type="submit" value="Update" class="btn btn-primary">
     </form>
 </div>
+<script>
+// UCID: dns33
+// JS Validation: edit_yt_channel
+function validateChannelEdit(form) {
+  // Clear any old flash if present
+  const flash = document.getElementById("flash");
+  if (flash) flash.innerHTML = "";
+
+  function showMsg(msg) {
+    if (!flash) {
+      alert(msg);
+      return;
+    }
+    const outer = document.createElement("div");
+    outer.className = "row justify-content-center";
+    const inner = document.createElement("div");
+    inner.className = "alert alert-warning";
+    inner.innerText = msg;
+    outer.appendChild(inner);
+    flash.appendChild(outer);
+  }
+
+  const title = (form.title?.value || "").trim();
+  const vanity = (form.vanity_url?.value || "").trim();
+  const avatar = (form.avatar_url?.value || "").trim();
+
+  // Required (stronger than HTML required because it rejects spaces)
+  if (!title) {
+    showMsg("Title cannot be blank.");
+    return false;
+  }
+
+  // If URL fields are provided, ensure they look valid and use https
+  // (HTML type=url helps, but JS makes it stricter + user-friendly)
+  const urlRegex = /^https:\/\/.+/i;
+
+  if (vanity && !urlRegex.test(vanity)) {
+    showMsg("Vanity URL must start with https://");
+    return false;
+  }
+
+  if (avatar && !urlRegex.test(avatar)) {
+    showMsg("Avatar URL must start with https://");
+    return false;
+  }
+
+  return true;
+}
+</script>
 
 <?php require_once(__DIR__ . "/../../../partials/flash.php"); ?>
