@@ -101,14 +101,10 @@ if (isset($_POST["action"])) {
 <div class="container-fluid">
     <h3>Create or Fetch YouTube Videos</h3>
 
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a class="nav-link bg-success" href="#" onclick="switchTab('fetch'); return false;">Fetch</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link bg-success" href="#" onclick="switchTab('create'); return false;">Create</a>
-        </li>
-    </ul>
+    <div class="tab-bar">
+      <button type="button" class="tab-btn" onclick="switchTab('fetch')">Fetch</button>
+      <button type="button" class="tab-btn" onclick="switchTab('create')">Create</button>
+    </div>
 
     <div id="fetch" class="tab-target">
         <form method="POST">

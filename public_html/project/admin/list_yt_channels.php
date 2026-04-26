@@ -61,65 +61,80 @@ try {
 }
 ?>
 <div class="container-fluid">
-    <h3>List YouTube Channels</h3>
+  <h3>List YouTube Channels</h3>
 
-    <form method="GET">
+  <div class="card">
+    <div class="card-body">
+      <form method="GET" class="filter-form">
         <div class="mb-3">
-            <label>Search</label>
-            <input type="search" name="search" value="<?php se($_GET, "search"); ?>" placeholder="title or channel id" />
+          <label>Search</label>
+          <input type="search" name="search" value="<?php se($_GET, "search"); ?>" placeholder="title or channel id" />
         </div>
 
         <div class="mb-3">
-            <label>Sort</label>
-            <select name="sort">
-                <?php foreach ($allowedSort as $c): ?>
-                    <option value="<?php echo $c; ?>" <?php echo ($c === $sort) ? "selected" : ""; ?>>
-                        <?php echo $c; ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-
-            <select name="dir">
-                <option value="desc" <?php echo ($dir === "desc") ? "selected" : ""; ?>>desc</option>
-                <option value="asc" <?php echo ($dir === "asc") ? "selected" : ""; ?>>asc</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label>Limit (1-100)</label>
-            <input type="number" name="limit" min="1" max="100" value="<?php echo htmlspecialchars($limit); ?>" />
-        </div>
-
-        <input type="submit" value="Apply" />
-    </form>
-
-    <?php if (count($results) == 0) : ?>
-        <p>No results to show</p>
-    <?php else : ?>
-        <table class="table">
-            <?php foreach ($results as $index => $record) : ?>
-                <?php if ($index == 0) : ?>
-                    <thead>
-                        <?php foreach ($record as $column => $value) : ?>
-                            <th><?php se($column); ?></th>
-                        <?php endforeach; ?>
-                        <th>Actions</th>
-                    </thead>
-                <?php endif; ?>
-                <tr>
-                    <?php foreach ($record as $column => $value) : ?>
-                        <td><?php se($value, null, "N/A"); ?></td>
-                    <?php endforeach; ?>
-                    <td>
-                        <a href="<?php echo get_url("admin/view_yt_channel.php", true); ?>?id=<?php se($record, "id"); ?>">View</a>
-                        |
-                        <a href="<?php echo get_url("admin/edit_yt_channel.php", true); ?>?id=<?php se($record, "id"); ?>">Edit</a>
-                        |
-                        <a href="<?php echo get_url("admin/delete_yt_channel.php", true); ?>?id=<?php se($record, "id"); ?>">Delete</a>
-                    </td>
-                </tr>
+          <label>Sort</label>
+          <select name="sort">
+            <?php foreach ($allowedSort as $c): ?>
+              <option value="<?php echo $c; ?>" <?php echo ($c === $sort) ? "selected" : ""; ?>>
+                <?php echo $c; ?>
+              </option>
             <?php endforeach; ?>
-        </table>
-    <?php endif; ?>
+          </select>
+
+          <select name="dir">
+            <option value="desc" <?php echo ($dir === "desc") ? "selected" : ""; ?>>desc</option>
+            <option value="asc" <?php echo ($dir === "asc") ? "selected" : ""; ?>>asc</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label>Limit (1-100)</label>
+          <input type="number" name="limit" min="1" max="100" value="<?php echo htmlspecialchars($limit); ?>" />
+        </div>
+
+        <input type="submit" value="Apply" class="btn btn-primary" />
+      </form>
+    </div>
+  </div>
+
+  <?php if (count($results) == 0) : ?>
+    <p>No results to show</p>
+  <?php else : ?>
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <?php foreach ($results as $index => $record) : ?>
+              <?php if ($index == 0) : ?>
+                <thead>
+                  <tr>
+                    <?php foreach ($record as $column => $value) : ?>
+                      <th><?php se($column); ?></th>
+                    <?php endforeach; ?>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+              <?php endif; ?>
+
+              <tr>
+                <?php foreach ($record as $column => $value) : ?>
+                  <td><?php se($value, null, "N/A"); ?></td>
+                <?php endforeach; ?>
+
+                <td class="actions">
+                  <a href="<?php echo get_url("admin/view_yt_channel.php", true); ?>?id=<?php se($record, "id"); ?>">View</a>
+                  <a href="<?php echo get_url("admin/edit_yt_channel.php", true); ?>?id=<?php se($record, "id"); ?>">Edit</a>
+                  <a href="<?php echo get_url("admin/delete_yt_channel.php", true); ?>?id=<?php se($record, "id"); ?>">Delete</a>
+                </td>
+              </tr>
+
+            <?php endforeach; ?>
+                </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
 </div>
 <?php require_once(__DIR__ . "/../../../partials/flash.php"); ?>
