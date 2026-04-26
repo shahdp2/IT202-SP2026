@@ -65,7 +65,7 @@ if ($id > 0) {
     <p><b>Video ID (read-only):</b> <?php se($video, "video_id"); ?></p>
     <p><b>Channel ID (read-only):</b> <?php se($video, "channel_id"); ?></p>
 
-    <form method="POST">
+    <form method="POST" onsubmit="return validateVideoEdit(this);">
         <div class="mb-3">
             <label for="title">Video Title</label>
             <input type="text" name="title" id="title" required maxlength="150" value="<?php se($video, "title"); ?>">
@@ -106,5 +106,60 @@ if ($id > 0) {
         <input type="submit" value="Update" class="btn btn-primary">
     </form>
 </div>
+
+<script>
+// UCID: dns33
+// JS Validation: edit_yt_video
+function validateVideoEdit(form) {
+  const flash = document.getElementById("flash");
+  if (flash) flash.innerHTML = "";
+
+  function showMsg(msg) {
+    if (!flash) {
+      alert(msg);
+      return;
+    }
+    const outer = document.createElement("div");
+    outer.className = "row justify-content-center";
+    const inner = document.createElement("div");
+    inner.className = "alert alert-warning";
+    inner.innerText = msg;
+    outer.appendChild(inner);
+    flash.appendChild(outer);
+  }
+
+  const title = (form.title?.value || "").trim();
+  const channelName = (form.channel_name?.value || "").trim();
+  const lengthText = (form.length_text?.value || "").trim();
+  const thumb = (form.thumbnail_url?.value || "").trim();
+
+  // Required (rejects spaces)
+  if (!title) {
+    showMsg("Video title cannot be blank.");
+    return false;
+  }
+  if (!channelName) {
+    showMsg("Channel name cannot be blank.");
+    return false;
+  }
+
+  // If provided, enforce Length format: M:SS or H:MM:SS
+  if (lengthText) {
+    const lenRegex = /^(\d{1,2}:\d{2}|\d{1,2}:\d{2}:\d{2})$/;
+    if (!lenRegex.test(lengthText)) {
+      showMsg("Length must be M:SS or H:MM:SS (example: 4:37 or 1:04:22).");
+      return false;
+    }
+  }
+
+  // If provided, require https:// for thumbnail
+  if (thumb && !/^https:\/\/.+/i.test(thumb)) {
+    showMsg("Thumbnail URL must start with https://");
+    return false;
+  }
+
+  return true;
+}
+</script>
 
 <?php require_once(__DIR__ . "/../../../partials/flash.php"); ?>
