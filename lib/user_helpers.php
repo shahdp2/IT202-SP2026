@@ -12,7 +12,7 @@ function is_logged_in($redirect = false, $destination = "login.php")
 
     if ($redirect && !$isLoggedIn) {
         flash("You must be logged in to view this page", "warning");
-        $path = get_url($destination);
+        redirect($destination);
 
         header("Location: $path");
         exit; 

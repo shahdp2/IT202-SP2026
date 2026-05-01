@@ -18,6 +18,17 @@ $search = trim(se($_GET, "search", "", false));
 
 // ---- Sort (whitelist) ----
 $allowedSort = ["created", "title", "channel_name", "published_text", "views_text"];
+$sortMap = [
+  "created" => "uv.created",
+  "title" => "v.title",
+  "channel_name" => "v.channel_name",
+  "published_text" => "v.published_text",
+  "views_text" => "v.views_text",
+];
+
+$sort = se($_GET, "sort", "created", false);
+if (!isset($sortMap[$sort])) $sort = "created";
+$orderBy = $sortMap[$sort];
 $sort = se($_GET, "sort", "created", false);
 if (!in_array($sort, $allowedSort, true)) $sort = "created";
 
@@ -56,7 +67,7 @@ if ($search !== "") {
     $params[":s"] = "%$search%";
 }
 
-$sql .= " ORDER BY `$sort` $dir LIMIT :lim";
+$sql .= " ORDER BY $orderBy $dir LIMIT :lim";
 
 $stmt = $db->prepare($sql);
 foreach ($params as $k => $v) $stmt->bindValue($k, $v);
@@ -113,7 +124,7 @@ $return = $_SERVER["REQUEST_URI"];
         <input type="number" name="limit" min="1" max="100" value="<?php echo htmlspecialchars((string)$limit); ?>">
 
         <input type="submit" value="Apply" class="btn btn-primary">
-        <a class="btn btn-secondary" href="<?php echo strtok($return, '?'); ?>">Reset</a>
+        <a class="btn btn-secondary" href="<?php echo get_url("my_videos.php", true); ?>">Reset</a>
     </form>
 
     <?php if (count($rows) === 0): ?>
@@ -138,7 +149,7 @@ $return = $_SERVER["REQUEST_URI"];
                         <td><?php se($r, "published_text", "N/A"); ?></td>
                         <td><?php se($r, "views_text", "N/A"); ?></td>
                         <td>
-                            <a href="<?php echo get_url("admin/view_yt_video.php", true); ?>?id=<?php se($r,"video_db_id"); ?>">View</a>
+                            <a href="<?php echo get_url("view_yt_video.php", true); ?>?id=<?php se($r,"video_db_id"); ?>">View</a>
                             |
                             <a href="<?php echo get_url("remove_saved_video.php", true); ?>?id=<?php se($r,"video_db_id"); ?>&return=<?php echo urlencode($return); ?>">
                                 Remove
