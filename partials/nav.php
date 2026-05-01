@@ -37,6 +37,7 @@ require(__DIR__ . "/../lib/functions.php");
         <?php if (is_logged_in()) : ?>
             <li><a href="<?php get_url('landing.php', true); ?>">Landing</a></li>
             <li><a href="<?php get_url('profile.php', true); ?>">Profile</a></li>
+            <li><a href="<?php get_url('my_videos.php', true); ?>">My Videos</a></li>
         <?php else : ?>
             <li><a href="<?php get_url('login.php', true); ?>">Login</a></li>
             <li><a href="<?php get_url('register.php', true); ?>">Register</a></li>
