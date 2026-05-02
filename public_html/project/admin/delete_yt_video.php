@@ -16,6 +16,12 @@ if (!has_role("Admin")) {
 }
 
 $id = (int)se($_GET, "id", -1, false);
+
+$return = se($_GET, "return", "", false);
+if (empty($return)) {
+    $return = get_url("admin/list_yt_videos.php");
+}
+
 if ($id < 1) {
     flash("Invalid video id", "warning");
     header("Location: " . get_url("admin/list_yt_videos.php"));
@@ -50,3 +56,5 @@ try {
 }
 
 redirect(get_last_route("admin/list_yt_videos.php"));
+
+

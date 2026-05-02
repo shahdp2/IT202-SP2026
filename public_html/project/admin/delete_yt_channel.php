@@ -12,6 +12,12 @@ if (!has_role("Admin")) {
 }
 
 $id = (int)se($_GET, "id", -1, false);
+
+$return = se($_GET, "return", "", false);
+if (empty($return)) {
+    $return = get_url("admin/list_yt_channels.php");
+}
+
 if ($id < 1) {
     flash("Invalid channel id", "warning");
     header("Location: " . get_url("admin/list_yt_channels.php"));
@@ -43,3 +49,4 @@ try {
 }
 
 redirect(get_last_route("admin/list_yt_channels.php"));
+
