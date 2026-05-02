@@ -48,5 +48,5 @@ try {
     flash("Error deleting channel", "danger");
 }
 
-header("Location: " . $return);
-exit;
+redirect(get_last_route("admin/list_yt_channels.php"));
+

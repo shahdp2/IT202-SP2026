@@ -9,7 +9,7 @@ if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
     die(header("Location: " . get_url("landing.php")));
 }
-
+store_current_route();
 $query = "SELECT 
             id, video_id, channel_id, title, channel_name, length_text, published_text, views_text, is_api, created
           FROM IT202_M2_YT_Videos
