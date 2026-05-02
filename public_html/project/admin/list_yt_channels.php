@@ -9,7 +9,7 @@ if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
     die(header("Location: " . get_url("landing.php")));
 }
-
+store_current_route();
 $db = getDB();
 
 // ---- Limit: valid range 1-100, default 10 ----

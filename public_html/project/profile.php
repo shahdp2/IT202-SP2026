@@ -1,15 +1,25 @@
 <?php
 ob_start();
 require_once(__DIR__ . "/../../partials/nav.php");
-is_logged_in(true); // redirects to login.php with flash if not logged in
-?>
-<!-- UCID dns33 | date 04/11/2026 -->
-<?php
-$user_id = get_user_id(); // get id from session
-$email = get_user_email(); // get email from session
-$username = get_username(); // get username from session
+
+// (Optional) make it fully public by NOT forcing login
+// If you want “login-public”, keep is_logged_in(true) instead.
+ // is_logged_in(true);
+
+// Pick which profile to view
+$view_id = (int)se($_GET, "id", get_user_id(), false);
+if ($view_id <= 0) {
+    flash("Invalid user id", "warning");
+    die(header("Location: " . get_url("landing.php")));
+}
+
+$is_me = (is_logged_in() && $view_id === get_user_id());
+$is_edit = $is_me && isset($_GET["edit"]);
+$user_id = get_user_id();
+$email = get_user_email();
+$username = get_username();
 // handle email/username update
-if (isset($_POST["email"], $_POST["username"])) {
+if ($is_edit && isset($_POST["email"], $_POST["username"])) {
     $new_email = se($_POST, "email", null, false);
     $new_username = se($_POST, "username", null, false);
     $hasError = false;
@@ -33,12 +43,12 @@ if (isset($_POST["email"], $_POST["username"])) {
     // check for changes
     if (($username != $new_username || $email != $new_email) && !$hasError) {
         $saved = false;
-        $params = [":email" => $new_email, ":username" => $new_username, ":id" => $user_id];
+        $params = [":email" => $new_email, ":username" => $new_username, ":id" => get_user_id()];
         $db = getDB();
         $stmt = $db->prepare("UPDATE Users set email = :email, username = :username where id = :id");
         try {
             $stmt->execute($params);
-            $updated_rows = $stmt->rowCount();
+            $updated_rows = $stmt->rowCount();  
             if ($updated_rows === 0) {
                 flash("No changes made", "warning");
             } else if ($updated_rows == 1) {
@@ -59,7 +69,7 @@ if (isset($_POST["email"], $_POST["username"])) {
             //select fresh data from table
             $stmt = $db->prepare("SELECT email, username from Users where id = :id LIMIT 1");
             try {
-                $stmt->execute([":id" => $user_id]);
+                $stmt->execute([":id" => get_user_id()]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($user) {
                     //$_SESSION["user"] = $user; // don't overwrite the entire session data, just update the specific fields
@@ -84,7 +94,7 @@ if (isset($_POST["email"], $_POST["username"])) {
     }
 }
 // handle password update
-if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassword"])) {
+if ($is_edit && isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassword"])) {
 
     //check/update password
     $current_password = se($_POST, "currentPassword", null, false);
@@ -151,34 +161,51 @@ if (isset($_POST["currentPassword"], $_POST["newPassword"], $_POST["confirmPassw
         }
     }
 }
+$db = getDB();
+$stmt = $db->prepare("SELECT id, username, email, created FROM Users WHERE id = :id");
+$stmt->execute([":id" => $view_id]);
+$profile_user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$profile_user) {
+    flash("User not found", "warning");
+    die(header("Location: " . get_url("landing.php")));
+}
 ?>
+
+
 <h3>Profile</h3>
-<!-- UCID dns33 | date 04/11/2026  -->
-<form method="POST" onsubmit="return validate(this);">
-    <div class="mb-3">
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" value="<?php se($email); ?>" required />
+
+<?php if ($is_me): ?>
+    <?php if ($is_edit): ?>
+        <a class="btn btn-secondary" href="<?php echo get_url("profile.php", true); ?>?id=<?php echo urlencode((string)$view_id); ?>">View Profile</a>
+    <?php else: ?>
+        <a class="btn btn-secondary" href="<?php echo get_url("profile.php", true); ?>?id=<?php echo urlencode((string)$view_id); ?>&edit=1">Edit Profile</a>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php if ($is_edit): ?>
+    <!-- KEEP YOUR EXISTING FORM HERE (your current edit form code) -->
+    <form method="POST" onsubmit="return validate(this);">
+        ...
+    </form>
+
+    <script>
+        // KEEP your existing validate(form) JS here
+    </script>
+
+<?php else: ?>
+    <!-- PUBLIC VIEW -->
+    <div class="card" style="max-width: 400px;">
+        <div class="card-body">
+            <h5 class="card-title"><?php se($profile_user, "username"); ?></h5>
+            <p><b>Joined:</b> <?php echo date("F j, Y", strtotime(se($profile_user, "created", "", false))); ?></p>
+
+            <?php if ($is_me): ?>
+                <p><b>Email:</b> <?php se($profile_user, "email"); ?></p>
+            <?php endif; ?>
+        </div>
     </div>
-    <div class="mb-3">
-        <label for="username">Username</label>
-        <input type="text" name="username" id="username" value="<?php se($username); ?>" required maxlength="30" />
-    </div>
-    <!-- DO NOT PRELOAD PASSWORD -->
-    <div>Password Reset</div>
-    <div class="mb-3">
-        <label for="cp">Current Password</label>
-        <input type="password" name="currentPassword" id="cp" />
-    </div>
-    <div class="mb-3">
-        <label for="np">New Password</label>
-        <input type="password" name="newPassword" id="np" />
-    </div>
-    <div class="mb-3">
-        <label for="conp">Confirm Password</label>
-        <input type="password" name="confirmPassword" id="conp" />
-    </div>
-    <input type="submit" value="Update Profile" name="save" />
-</form>
+<?php endif; ?>
 
 <script>
 //   UCID: dns33
