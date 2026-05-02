@@ -33,5 +33,4 @@ try {
     flash("Error removing saved video", "danger");
 }
 
-header("Location: " . $return);
-exit;
+redirect(get_last_route("my_videos.php"));

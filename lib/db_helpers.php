@@ -241,3 +241,43 @@ function update(
         throw $e;
     }
 }
+
+function selectAll($query, $params = [], $debug = false) {
+    if ($debug) {
+        error_log("Query: " . $query);
+        error_log("Params: " . var_export($params, true));
+    }
+
+    $db = getDB();
+    $stmt = $db->prepare($query);
+
+    // If params is [0=>...,1=>...] we treat it as positional (?)
+    $is_indexed = is_array($params) && array_keys($params) === range(0, count($params) - 1);
+
+    if ($is_indexed) {
+        // positional placeholders: bindValue(1..n)
+        foreach ($params as $i => $val) {
+            $type = match (true) {
+                is_int($val)  => PDO::PARAM_INT,
+                is_bool($val) => PDO::PARAM_BOOL,
+                is_null($val) => PDO::PARAM_NULL,
+                default       => PDO::PARAM_STR,
+            };
+            $stmt->bindValue($i + 1, $val, $type);
+        }
+    } else {
+        // named placeholders: bindValue(:key)
+        foreach ($params as $key => $val) {
+            $type = match (true) {
+                is_int($val)  => PDO::PARAM_INT,
+                is_bool($val) => PDO::PARAM_BOOL,
+                is_null($val) => PDO::PARAM_NULL,
+                default       => PDO::PARAM_STR,
+            };
+            $stmt->bindValue($key, $val, $type);
+        }
+    }
+
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
