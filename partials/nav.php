@@ -24,8 +24,10 @@ if ($domain != "localhost") {
     ]);
 }
 
-session_start();
-require(__DIR__ . "/../lib/functions.php");
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+require_once(__DIR__ . "/../lib/functions.php");
 ?>
 
 <link rel="stylesheet" href="<?php get_url('styles.css', true); ?>">
