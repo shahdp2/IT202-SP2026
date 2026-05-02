@@ -49,5 +49,4 @@ try {
     flash("Error deleting video", "danger");
 }
 
-header("Location: " . get_url("admin/list_yt_videos.php"));
-exit;
+redirect(get_last_route("admin/list_yt_videos.php"));

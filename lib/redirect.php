@@ -1,18 +1,21 @@
 <?php
+// UCID: dns33
+// Date: 04/26/2026
+// Summary: Redirect helper with JS + meta fallback (prevents header already sent issues).
 
-function redirect($path) { //header headache
-    //https://www.php.net/manual/en/function.headers-sent.php#90160
-    /*headers are sent at the end of script execution otherwise they are sent when the buffer reaches it's limit and emptied */
-    $url = get_url($path);
+function redirect($path) {
+    // If they pass a full URL or absolute path, keep it. Otherwise convert to app URL.
+    $url = (str_starts_with($path, "http") || str_starts_with($path, "/"))
+        ? $path
+        : get_url($path);
+
     if (!headers_sent()) {
-        //php redirect
-        die(header("Location: $url"));
+        header("Location: $url");
+        exit;
     }
-    // Escape URL for output
-    $safe_url = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
-    // JavaScript redirect
+
+    $safe_url = htmlspecialchars($url, ENT_QUOTES, "UTF-8");
     echo "<script>window.location.href='{$safe_url}';</script>";
-    // Meta refresh for no-JS
     echo "<noscript><meta http-equiv=\"refresh\" content=\"0;url={$safe_url}\"/></noscript>";
-    die();
+    exit;
 }

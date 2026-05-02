@@ -5,6 +5,7 @@
 
 require(__DIR__ . "/../../partials/nav.php");
 is_logged_in(true);
+store_current_route();
 
 $db = getDB();
 $user_id = get_user_id();
@@ -27,10 +28,10 @@ $sortMap = [
 ];
 
 $sort = se($_GET, "sort", "created", false);
-if (!isset($sortMap[$sort])) $sort = "created";
+if (!isset($sortMap[$sort])) {
+    $sort = "created";
+}
 $orderBy = $sortMap[$sort];
-$sort = se($_GET, "sort", "created", false);
-if (!in_array($sort, $allowedSort, true)) $sort = "created";
 
 $dir = strtolower(se($_GET, "dir", "desc", false));
 $dir = ($dir === "asc") ? "asc" : "desc";
@@ -41,9 +42,11 @@ $shown_count = 0;
 
 // Count all associations (for heading stats)
 try {
-    $stmt = $db->prepare("SELECT COUNT(*) AS c FROM IT202_M3_UserYTVideos WHERE user_id = :uid AND is_active = 1");
-    $stmt->execute([":uid" => $user_id]);
-    $total_count = (int)se($stmt->fetch(PDO::FETCH_ASSOC), "c", 0, false);
+    $r = selectAll(
+        "SELECT COUNT(*) AS c FROM IT202_M3_UserYTVideos WHERE user_id = :uid AND is_active = 1",
+        [":uid" => $user_id]
+    );
+    $total_count = (int)se($r[0] ?? [], "c", 0, false);
 } catch (PDOException $e) {
     error_log("my_videos count error: " . var_export($e, true));
 }
@@ -75,8 +78,7 @@ $stmt->bindValue(":lim", $limit, PDO::PARAM_INT);
 
 $rows = [];
 try {
-    $stmt->execute();
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $rows = selectAll($sql, $params);   // $params includes :uid, maybe :s, and :lim
     $shown_count = count($rows);
 } catch (PDOException $e) {
     error_log("my_videos fetch error: " . var_export($e, true));
@@ -84,9 +86,17 @@ try {
 }
 
 $return = $_SERVER["REQUEST_URI"];
+
 ?>
 <div class="container-fluid">
     <h3>My Watchlist</h3>
+<?php
+$result_stats = [
+  "current" => $shown_count,
+  "total" => $total_count
+];
+require(__DIR__ . "/../../partials/results_header.php");
+?>
 
     <p>
         <b>Total saved:</b> <?php echo htmlspecialchars((string)$total_count); ?>
@@ -149,7 +159,7 @@ $return = $_SERVER["REQUEST_URI"];
                         <td><?php se($r, "published_text", "N/A"); ?></td>
                         <td><?php se($r, "views_text", "N/A"); ?></td>
                         <td>
-                            <a href="<?php echo get_url("view_yt_video.php", true); ?>?id=<?php se($r,"video_db_id"); ?>">View</a>
+                            <a href="<?php echo get_url("admin/view_yt_video.php", true); ?>?id=<?php se($r,"video_db_id"); ?>">View</a>
                             |
                             <a href="<?php echo get_url("remove_saved_video.php", true); ?>?id=<?php se($r,"video_db_id"); ?>&return=<?php echo urlencode($return); ?>">
                                 Remove
