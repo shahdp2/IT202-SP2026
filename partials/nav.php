@@ -28,6 +28,10 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 require_once(__DIR__ . "/../lib/functions.php");
+
+$current = basename(parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)); // ex: landing.php
+$hide_main_links = ($current === "landing.php");
+
 ?>
 
 <link rel="stylesheet" href="<?php get_url('styles.css', true); ?>">
@@ -37,9 +41,14 @@ require_once(__DIR__ . "/../lib/functions.php");
 <nav>
     <ul>
         <?php if (is_logged_in()) : ?>
-            <li><a href="<?php get_url('landing.php', true); ?>">Landing</a></li>
-            <li><a href="<?php get_url('profile.php', true); ?>">Profile</a></li>
-            <li><a href="<?php get_url('my_videos.php', true); ?>">My Videos</a></li>
+        
+            <?php if (!$hide_main_links): ?>
+                <li><a href="<?php get_url('landing.php', true); ?>">Landing</a></li>
+                <li><a href="<?php get_url('profile.php', true); ?>">Profile</a></li>
+                <li><a href="<?php get_url('my_videos.php', true); ?>">My Videos</a></li>
+                <li><a href="<?php get_url('videos.php', true); ?>">Videos</a></li>
+            <?php endif; ?>
+            
         <?php else : ?>
             <li><a href="<?php get_url('login.php', true); ?>">Login</a></li>
             <li><a href="<?php get_url('register.php', true); ?>">Register</a></li>
@@ -67,9 +76,15 @@ require_once(__DIR__ . "/../lib/functions.php");
                 </div>
             </li>
         <?php endif; ?>
-
         <?php if (is_logged_in()) : ?>
-            <li><a href="<?php get_url('logout.php', true); ?>">Logout</a></li>
+          <?php if (!$hide_main_links): ?>
+            <!-- main links -->
+          <?php endif; ?>
+        
+          <!-- always show -->
+          <li class="logout">
+            <a href="<?php get_url('logout.php', true); ?>">Logout</a>
+          </li>
         <?php endif; ?>
     </ul>
 </nav>

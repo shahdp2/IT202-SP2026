@@ -1,7 +1,7 @@
 CREATE TABLE `IT202_M2_YT_Videos` (
   `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `video_id` VARCHAR(20) NOT NULL UNIQUE,            -- e.g., c80ELNJ0LJE
-  `channel_id` VARCHAR(40) NOT NULL,                 -- FK-style link to Channels.channel_id
+  `channel_id` VARCHAR(40) NULL,                 -- FK-style link to Channels.channel_id
   `title` VARCHAR(150) NOT NULL,
   `channel_name` VARCHAR(120) NOT NULL,
   `length_text` VARCHAR(20) NULL,                    -- "4:37"
