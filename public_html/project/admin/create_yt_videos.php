@@ -23,7 +23,7 @@ if (isset($_POST["action"])) {
             $bundle = yt_channel_search($channelId, $query, $next);
 
             // IMPORTANT: yt_channel_search returns ["videos"=> already transformed rows]
-            $videos = se($bundle, "videos", [], false);
+            $videos = (isset($bundle["videos"]) && is_array($bundle["videos"])) ? $bundle["videos"] : [];
 
             error_log("YT videos from API: " . var_export($videos, true));
 
