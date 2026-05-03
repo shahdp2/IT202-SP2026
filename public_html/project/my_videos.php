@@ -71,10 +71,7 @@ if ($search !== "") {
 }
 
 $sql .= " ORDER BY $orderBy $dir LIMIT :lim";
-
-$stmt = $db->prepare($sql);
-foreach ($params as $k => $v) $stmt->bindValue($k, $v);
-$stmt->bindValue(":lim", $limit, PDO::PARAM_INT);
+$params[":lim"] = (int)$limit;
 
 $rows = [];
 try {
@@ -159,11 +156,13 @@ require(__DIR__ . "/../../partials/results_header.php");
                         <td><?php se($r, "published_text", "N/A"); ?></td>
                         <td><?php se($r, "views_text", "N/A"); ?></td>
                         <td>
-                            <a href="<?php echo get_url("admin/view_yt_video.php", true); ?>?id=<?php se($r,"video_db_id"); ?>">View</a>
-                            |
-                            <a href="<?php echo get_url("remove_saved_video.php", true); ?>?id=<?php se($r,"video_db_id"); ?>&return=<?php echo urlencode($return); ?>">
-                                Remove
-                            </a>
+                          <?php $vid_id = (int)se($r, "video_db_id", -1, false); ?>
+                                        
+                          <a href="<?php echo get_url("view_video.php", true); ?>?id=<?php echo $vid_id; ?>">View</a>
+                          |
+                          <a href="<?php echo get_url("remove_saved_video.php", true); ?>?id=<?php echo $vid_id; ?>&return=<?php echo urlencode($return); ?>">
+                            Remove
+                          </a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

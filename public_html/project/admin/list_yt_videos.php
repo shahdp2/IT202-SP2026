@@ -139,12 +139,19 @@ try {
                 <?php foreach ($record as $column => $value) : ?>
                   <td><?php se($value, null, "N/A"); ?></td>
                 <?php endforeach; ?>
-
-                <td class="actions">
-                  <a href="<?php echo get_url("admin/view_yt_video.php", true); ?>?id=<?php se($record, "id"); ?>">View</a>
-                  <a href="<?php echo get_url("admin/edit_yt_video.php", true); ?>?id=<?php se($record, "id"); ?>">Edit</a>
-                  <a href="<?php echo get_url("admin/delete_yt_video.php", true); ?>?id=<?php se($record, "id"); ?>&return=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">Delete</a>
-                </td>
+                  <td class="actions">
+                    <a href="<?php echo get_url("admin/view_yt_video.php", true); ?>?id=<?php se($record, "id"); ?>">View</a>
+                    |
+                    <a href="<?php echo get_url("admin/edit_yt_video.php", true); ?>?id=<?php se($record, "id"); ?>">Edit</a>
+                    |
+                    <a href="<?php echo get_url("toggle_save_video.php", true); ?>?id=<?php se($record, "id"); ?>&return=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">
+                      Save
+                    </a>
+                    |
+                    <a href="<?php echo get_url("admin/delete_yt_video.php", true); ?>?id=<?php se($record, "id"); ?>&return=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">
+                      Delete
+                    </a>
+                  </td>
               </tr>
 
             <?php endforeach; ?>
