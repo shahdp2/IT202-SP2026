@@ -54,7 +54,7 @@ SELECT
   v.views_text,
   COUNT(DISTINCT uv.user_id) AS user_count,
   MAX(uv.created) AS last_added,
-  GROUP_CONCAT(DISTINCT u.username ORDER BY u.username SEPARATOR ', ') AS usernames
+  GROUP_CONCAT(DISTINCT CONCAT(u.id, ':', u.username) ORDER BY u.username SEPARATOR ', ') AS user_pairs
 FROM IT202_M3_UserYTVideos uv
 JOIN IT202_M2_YT_Videos v ON v.id = uv.yt_video_id
 JOIN Users u ON u.id = uv.user_id
@@ -152,10 +152,23 @@ $return = $_SERVER["REQUEST_URI"];
               <td><?php se($r,"channel_name"); ?></td>
               <td>
                 <?php
-                  $names = se($r,"usernames","",false);
-                  $parts = array_filter(array_map("trim", explode(",", (string)$names)));
-                  foreach ($parts as $name) {
-                    echo '<a href="'.get_url("profile.php", true).'?username='.urlencode($name).'">'.htmlspecialchars($name).'</a> ';
+                  $pairs = (string)se($r, "user_pairs", "", false);
+                  $items = array_filter(array_map("trim", explode(",", $pairs)));
+
+                  foreach ($items as $item) {
+                    $pos = strpos($item, ":");
+                    if ($pos === false) continue;
+
+                    $uid = (int)substr($item, 0, $pos);
+                    $uname = trim(substr($item, $pos + 1));
+
+                    if ($uid < 1 || $uname === "") continue;
+
+                    $url = get_url("profile.php", false) . "?id=" . $uid;
+
+                    echo '<a href="' . htmlspecialchars($url, ENT_QUOTES, "UTF-8") . '">'
+                       . htmlspecialchars($uname, ENT_QUOTES, "UTF-8")
+                       . '</a> ';
                   }
                 ?>
               </td>
