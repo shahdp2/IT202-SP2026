@@ -3,12 +3,18 @@
 // Date: 04/26/2026
 // Summary: Admin list of videos associated with users (username filter + count + limit)
 
-require(__DIR__ . "/../../../partials/nav.php");
+error_reporting(E_ALL & ~E_DEPRECATED);
+ini_set('display_errors', '0');
+
+session_start();
+require_once(__DIR__ . "/../../../lib/functions.php"); // ✅ no nav.php here
 
 if (!has_role("Admin")) {
   flash("You don't have permission to view this page", "warning");
-  die(header("Location: " . get_url("landing.php")));
+  redirect("landing.php");
 }
+
+store_current_route();
 
 $db = getDB();
 
@@ -31,20 +37,38 @@ $dir = ($dir === "asc") ? "asc" : "desc";
 $total = 0;
 $shown = 0;
 
-// total distinct videos associated
+// safe return (used by buttons/links)
+$return = se($_SERVER, "REQUEST_URI", get_url("admin/list_user_video_associations.php"), false);
+if (!is_string($return) || strpos($return, "/project") !== 0) {
+  $return = get_url("admin/list_user_video_associations.php");
+}
+
+/* ---------- COUNT (TOTAL) ---------- */
+/* Recommended: total should respect the username filter so "Total" makes sense */
 try {
   $countSql = "
     SELECT COUNT(DISTINCT uv.yt_video_id) AS c
     FROM IT202_M3_UserYTVideos uv
+    JOIN Users u ON u.id = uv.user_id
     WHERE uv.is_active = 1
   ";
+  $countParams = [];
+
+  if ($username !== "") {
+    $countSql .= " AND u.username LIKE :uname ";
+    $countParams[":uname"] = "%$username%";
+  }
+
   $stmt = $db->prepare($countSql);
+  foreach ($countParams as $k => $v) $stmt->bindValue($k, $v);
   $stmt->execute();
+
   $total = (int)se($stmt->fetch(PDO::FETCH_ASSOC), "c", 0, false);
 } catch (PDOException $e) {
   error_log("assoc count error: " . var_export($e, true));
 }
 
+/* ---------- MAIN QUERY ---------- */
 $sql = "
 SELECT
   v.id AS video_db_id,
@@ -91,9 +115,9 @@ try {
   error_log("assoc list error: " . var_export($e, true));
   flash("Error loading associations", "danger");
 }
-
-$return = $_SERVER["REQUEST_URI"];
 ?>
+<?php require(__DIR__ . "/../../../partials/nav.php"); ?>
+
 <div class="container-fluid">
   <h3>Videos Associated With Users</h3>
 
