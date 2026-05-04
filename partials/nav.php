@@ -62,6 +62,7 @@ $hide_main_links = ($current === "landing.php");
                     <a href="<?php get_url('admin/create_role.php', true); ?>">Create Role</a>
                     <a href="<?php get_url('admin/list_roles.php', true); ?>">List Roles</a>
                     <a href="<?php get_url('admin/assign_roles.php', true); ?>">Assign Roles</a>
+                    <a href="<?php get_url('admin/assign_user_videos.php', true); ?>">Assign User Roles</a>
                 </div>
             </li>
 
