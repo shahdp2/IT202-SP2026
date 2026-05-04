@@ -15,6 +15,8 @@ $db = getDB();
 $video_q = trim(se($_GET,"video","",false));
 $user_q  = trim(se($_GET,"user","",false));
 
+$did_search = ($video_q !== "" || $user_q !== "");
+
 $videos = [];
 $users  = [];
 
@@ -29,12 +31,13 @@ if ($video_q !== "") {
 
 // search users (max 25)
 if ($user_q !== "") {
-  $stmt = $db->prepare("SELECT id, username, email FROM Users
-                        WHERE username LIKE :q OR email LIKE :q
-                        ORDER BY created DESC LIMIT 25");
+  $stmt = $db->prepare("SELECT id, username FROM Users
+                      WHERE username LIKE :q
+                      ORDER BY username ASC LIMIT 25");
   $stmt->execute([":q" => "%$user_q%"]);
   $users = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
+
 
 // apply toggles
 if (isset($_POST["apply"]) && isset($_POST["video_ids"], $_POST["user_ids"])) {
@@ -45,6 +48,9 @@ if (isset($_POST["apply"]) && isset($_POST["video_ids"], $_POST["user_ids"])) {
     flash("Select at least 1 user and 1 video", "warning");
   } else {
     $toggled = 0;
+    $check = $db->prepare("SELECT id, is_active FROM IT202_M3_UserYTVideos WHERE user_id=:u AND yt_video_id=:v LIMIT 1");
+    $upd = $db->prepare("UPDATE IT202_M3_UserYTVideos SET is_active=:a WHERE id=:id");
+    $ins = $db->prepare("INSERT INTO IT202_M3_UserYTVideos (user_id, yt_video_id, is_active) VALUES (:u,:v,1)");
 
     foreach ($user_ids as $uid) {
       $uid = (int)$uid;
@@ -75,6 +81,7 @@ if (isset($_POST["apply"]) && isset($_POST["video_ids"], $_POST["user_ids"])) {
   // keep search terms after post
   $video_q = trim(se($_POST,"video_q","",false));
   $user_q  = trim(se($_POST,"user_q","",false));
+  
   header("Location: " . get_url("admin/assign_user_videos.php", true) . "?video=" . urlencode($video_q) . "&user=" . urlencode($user_q));
   exit;
 }
@@ -116,7 +123,7 @@ if (isset($_POST["apply"]) && isset($_POST["video_ids"], $_POST["user_ids"])) {
 
       <div class="col-md-6">
         <h5>Users (max 25)</h5>
-        <?php if (count($users)===0): ?>
+        <?php if ($did_search && count($users)===0): ?>
           <p>No results available</p>
         <?php else: ?>
           <?php foreach($users as $u): ?>
@@ -124,7 +131,6 @@ if (isset($_POST["apply"]) && isset($_POST["video_ids"], $_POST["user_ids"])) {
               <label>
                 <input type="checkbox" name="user_ids[]" value="<?php echo (int)$u["id"]; ?>">
                 <?php echo htmlspecialchars($u["username"]); ?>
-                (<?php echo htmlspecialchars($u["email"]); ?>)
               </label>
             </div>
           <?php endforeach; ?>
