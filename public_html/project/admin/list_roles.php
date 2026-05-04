@@ -52,55 +52,87 @@ try {
 }
 
 ?>
-<h3>List Roles</h3>
-<form method="POST">
-    <!-- value is used to create a sticky form (maintains the data used in the initial form submission) -->
-    <input type="search" name="role" placeholder="Role Filter" value="<?php se($_POST, "role"); ?>" />
-    <input type="submit" value="Search" />
-</form>
-<small>Note: If you disabled Admin, you won't be able to login as Admin again until you re-enable it (may require a manual table edit).</small>
-<table>
-    <thead>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Active</th>
-        <th>Action</th>
-    </thead>
-    <tbody>
-        <?php if (empty($roles)) : ?>
-            <tr>
-                <td colspan="100%">No roles</td>
-            </tr>
-        <?php else : ?>
-            <?php foreach ($roles as $role) : ?>
+<div class="container-fluid" style="max-width: 1100px;">
+  <h3 class="text-center my-3">List Roles</h3>
+
+  <div class="card shadow-sm mb-3">
+    <div class="card-body">
+      <form method="POST" class="row g-2 align-items-center">
+        <div class="col-md-9">
+          <label class="form-label fw-semibold">Role Filter</label>
+          <input
+            type="search"
+            class="form-control"
+            name="role"
+            placeholder="Search role name (partial match)"
+            value="<?php se($_POST, "role"); ?>"
+          />
+        </div>
+        <div class="col-md-3 d-grid mt-4 mt-md-0">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+
+      <small class="text-muted d-block mt-2">
+        Note: If you disable <b>Admin</b>, you may not be able to login as Admin again until it is re-enabled (may require a manual table edit).
+      </small>
+    </div>
+  </div>
+
+  <?php if (empty($roles)) : ?>
+    <div class="alert alert-warning">No roles found.</div>
+  <?php else : ?>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped align-middle">
+            <thead>
+              <tr>
+                <th style="width:80px;">ID</th>
+                <th style="width:160px;">Name</th>
+                <th>Description</th>
+                <th style="width:120px;">Status</th>
+                <th style="width:140px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($roles as $role) : ?>
                 <tr>
-                    <td><?php se($role, "id"); ?></td>
-                    <td><?php se($role, "name"); ?></td>
-                    <td><?php se($role, "description"); ?></td>
-                    <td><?php echo (se($role, "is_active", 0, false) ? "active" : "disabled"); ?></td>
-                    <td>
-                        <!-- nested form to handle toggling the role -->
-                        <form method="POST">
-                            <!-- hidden field to carry the id, the user shouldn't be prompted to edit this-->
-                            <input type="hidden" name="role_id" value="<?php se($role, 'id'); ?>" />
-                            <!-- used to persist the search criteria since this is a different form -->
-                            <?php if (isset($search) && !empty($search)) : ?>
-                                <input type="hidden" name="role" value="<?php se($search, null); ?>" />
-                            <?php endif; ?>
-                            <!-- toggle button to change the role's active status -->
-                            <?php if (se($role, "is_active", 0, false)) : ?>
-                                <input type="submit" value="Disable" />
-                            <?php else : ?>
-                                <input type="submit" value="Enable" />
-                            <?php endif; ?>
-                        </form>
-                    </td>
+                  <td><?php se($role, "id"); ?></td>
+                  <td class="fw-semibold"><?php se($role, "name"); ?></td>
+                  <td><?php se($role, "description", "—"); ?></td>
+                  <td>
+                    <?php if (se($role, "is_active", 0, false)) : ?>
+                      <span class="badge text-bg-success">active</span>
+                    <?php else : ?>
+                      <span class="badge text-bg-secondary">disabled</span>
+                    <?php endif; ?>
+                  </td>
+                  <td>
+                    <form method="POST" class="m-0">
+                      <input type="hidden" name="role_id" value="<?php se($role, 'id'); ?>" />
+                      <?php if (isset($search) && !empty($search)) : ?>
+                        <input type="hidden" name="role" value="<?php echo htmlspecialchars($search); ?>" />
+                      <?php endif; ?>
+
+                      <?php if (se($role, "is_active", 0, false)) : ?>
+                        <button type="submit" class="btn btn-sm btn-outline-danger w-100">Disable</button>
+                      <?php else : ?>
+                        <button type="submit" class="btn btn-sm btn-outline-success w-100">Enable</button>
+                      <?php endif; ?>
+                    </form>
+                  </td>
                 </tr>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </tbody>
-</table>
+              <?php endforeach; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  <?php endif; ?>
+</div>
+
+<?php require_once(__DIR__ . "/../../../partials/flash.php"); ?>
 <?php
 //note we need to go up 1 more directory
 require_once(__DIR__ . "/../../../partials/flash.php");
