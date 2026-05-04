@@ -26,13 +26,20 @@ $users  = [];
 
 /* ---------- POST: apply toggles (must be BEFORE nav.php) ---------- */
 if (isset($_POST["apply"])) {
-  $video_ids = se($_POST, "video_ids", [], false);
-  $user_ids  = se($_POST, "user_ids", [], false);
 
+  // ✅ FIX: DO NOT use se() for checkbox arrays
+  $video_ids = $_POST["video_ids"] ?? [];
+  $user_ids  = $_POST["user_ids"] ?? [];
+
+  // these are strings, se() is fine
   $video_q = trim(se($_POST, "video_q", "", false));
   $user_q  = trim(se($_POST, "user_q", "", false));
 
-  if (!is_array($video_ids) || !is_array($user_ids) || count($video_ids) === 0 || count($user_ids) === 0) {
+  // ✅ FIX: normalize in case something weird comes in
+  if (!is_array($video_ids)) { $video_ids = []; }
+  if (!is_array($user_ids))  { $user_ids  = []; }
+
+  if (count($video_ids) === 0 || count($user_ids) === 0) {
     flash("Select at least 1 user and 1 video", "warning");
   } else {
     $toggled = 0;
@@ -44,8 +51,11 @@ if (isset($_POST["apply"])) {
 
     foreach ($user_ids as $uid) {
       $uid = (int)$uid;
+      if ($uid < 1) { continue; } // optional safety
+
       foreach ($video_ids as $vid) {
         $vid = (int)$vid;
+        if ($vid < 1) { continue; } // optional safety
 
         $check->execute([":u" => $uid, ":v" => $vid]);
         $row = $check->fetch(PDO::FETCH_ASSOC);
