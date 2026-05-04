@@ -62,7 +62,6 @@ $hide_main_links = ($current === "landing.php");
                     <a href="<?php get_url('admin/create_role.php', true); ?>">Create Role</a>
                     <a href="<?php get_url('admin/list_roles.php', true); ?>">List Roles</a>
                     <a href="<?php get_url('admin/assign_roles.php', true); ?>">Assign Roles</a>
-                    <a href="<?php get_url('admin/list_user_video_associations.php', true); ?>">Video Associations</a>
                 </div>
             </li>
 
@@ -74,6 +73,8 @@ $hide_main_links = ($current === "landing.php");
                     <a href="<?php get_url('admin/list_yt_channels.php', true); ?>">List Channels</a>
                     <a href="<?php get_url('admin/create_yt_videos.php', true); ?>">Create/Fetch Video</a>
                     <a href="<?php get_url('admin/list_yt_videos.php', true); ?>">List Videos</a>
+                    <a href="<?php get_url('admin/list_user_video_associations.php', true); ?>">Video Associations</a>
+                    <a href="<?php get_url('admin/list_unassociated_videos.php', true); ?>">Unassociated Videos</a>
                 </div>
             </li>
         <?php endif; ?>
