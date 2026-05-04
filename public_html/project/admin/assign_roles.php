@@ -89,52 +89,166 @@ if (isset($_POST["username"])) {
 
 
 ?>
-<h3>Assign Roles</h3>
-<!-- search form -->
-<form method="POST">
-    <input type="search" name="username" placeholder="Username search" value="<?php se($username, false); ?>" />
-    <input type="submit" value="Search" />
-</form>
-<!-- empty toggle form, inputs will use the form attribute to associate with this form -->
-<form id="toggleForm" method="POST"></form>
-<?php if (isset($username) && !empty($username)) : ?>
-    <input form="toggleForm" type="hidden" name="username" value="<?php se($username, false); ?>" />
-<?php endif; ?>
-<table>
-    <thead>
-        <th>Users</th>
-        <th>Roles to Assign</th>
-    </thead>
-    <tbody>
-        <tr>
-            <td>
-                <!-- nested table for users -->
-                <table>
-                    <?php foreach ($users as $user) : ?>
-                        <tr>
-                            <td>
+<h3 class="text-center my-3">Assign Roles</h3>
 
-                                <input form="toggleForm" id="user_<?php se($user, 'id'); ?>" type="checkbox" name="users[]" value="<?php se($user, 'id'); ?>" />
-                                <label form="toggleForm" for="user_<?php se($user, 'id'); ?>"><?php se($user, "username"); ?></label>
-                            </td>
-                            <td><?php se($user, "roles", "No Roles"); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </table>
-            </td>
-            <td>
-                <!-- nested data for roles -->
-                <?php foreach ($active_roles as $role) : ?>
-                    <div>
-                        <input form="toggleForm" id="role_<?php se($role, 'id'); ?>" type="checkbox" name="roles[]" value="<?php se($role, 'id'); ?>" />
-                        <label form="toggleForm" for="role_<?php se($role, 'id'); ?>"><?php se($role, "name"); ?></label>
-                    </div>
-                <?php endforeach; ?>
-            </td>
-        </tr>
-    </tbody>
-</table>
-<input form="toggleForm" type="submit" value="Toggle Roles" />
+<div class="container-fluid" style="max-width: 1100px;">
+
+  <!-- Search Card -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <form method="POST" class="row g-2 align-items-center">
+        <div class="col-md-9">
+          <label class="form-label fw-semibold">Username search</label>
+          <input
+            type="search"
+            class="form-control"
+            name="username"
+            placeholder="Search by username (partial match)"
+            value="<?php se($username, false); ?>"
+          />
+        </div>
+        <div class="col-md-3 d-grid mt-4 mt-md-0">
+          <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+      </form>
+
+      <?php if (isset($username) && !empty($username)) : ?>
+        <div class="mt-2 text-muted">
+          Showing results for: <span class="fw-semibold"><?php se($username, false); ?></span>
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <!-- Toggle Form -->
+  <form id="toggleForm" method="POST"></form>
+  <?php if (isset($username) && !empty($username)) : ?>
+    <input form="toggleForm" type="hidden" name="username" value="<?php se($username, false); ?>" />
+  <?php endif; ?>
+
+  <div class="row g-4">
+    <!-- Users -->
+    <div class="col-lg-7">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="fw-bold">Users</div>
+            <small class="text-muted">Select user(s) to toggle roles</small>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <?php if (!isset($username) || empty($username)) : ?>
+            <p class="text-muted mb-0">Search a username to load users and roles.</p>
+
+          <?php elseif (count($users) === 0) : ?>
+            <p class="text-muted mb-0">No results available.</p>
+
+          <?php else : ?>
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr>
+                    <th style="width: 80px;">Pick</th>
+                    <th>User</th>
+                    <th>Current Roles</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <?php foreach ($users as $user) : ?>
+                    <tr>
+                      <td>
+                        <input
+                          form="toggleForm"
+                          class="form-check-input"
+                          id="user_<?php se($user, 'id'); ?>"
+                          type="checkbox"
+                          name="users[]"
+                          value="<?php se($user, 'id'); ?>"
+                        />
+                      </td>
+                      <td>
+                        <label class="fw-semibold" for="user_<?php se($user, 'id'); ?>">
+                          <?php se($user, "username"); ?>
+                        </label>
+                      </td>
+                      <td>
+                        <?php
+                          $rolesText = se($user, "roles", "", false);
+                          if (!$rolesText) {
+                            echo '<span class="badge text-bg-secondary">No Roles</span>';
+                          } else {
+                            // Render as light badge chips
+                            $parts = array_filter(array_map("trim", explode(",", $rolesText)));
+                            foreach ($parts as $p) {
+                              echo '<span class="badge text-bg-light border me-1 mb-1">' . htmlspecialchars($p) . '</span>';
+                            }
+                          }
+                        ?>
+                      </td>
+                    </tr>
+                  <?php endforeach; ?>
+                </tbody>
+              </table>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roles -->
+    <div class="col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="fw-bold">Roles to Assign</div>
+            <small class="text-muted">Select role(s)</small>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <?php if (!isset($username) || empty($username)) : ?>
+            <p class="text-muted mb-0">Search a username first.</p>
+
+          <?php elseif (count($active_roles) === 0) : ?>
+            <p class="text-muted mb-0">No active roles available.</p>
+
+          <?php else : ?>
+            <div class="d-flex flex-column gap-2">
+              <?php foreach ($active_roles as $role) : ?>
+                <div class="form-check">
+                  <input
+                    form="toggleForm"
+                    class="form-check-input"
+                    id="role_<?php se($role, 'id'); ?>"
+                    type="checkbox"
+                    name="roles[]"
+                    value="<?php se($role, 'id'); ?>"
+                  />
+                  <label class="form-check-label fw-semibold" for="role_<?php se($role, 'id'); ?>">
+                    <?php se($role, "name"); ?>
+                  </label>
+                </div>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+        </div>
+
+        <div class="card-footer bg-white">
+          <button form="toggleForm" type="submit" class="btn btn-success w-100" <?php echo (empty($users) || empty($active_roles)) ? "disabled" : ""; ?>>
+            Toggle Roles
+          </button>
+          <small class="text-muted d-block mt-2">
+            If the user already has the role, it will be disabled; otherwise it will be added.
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<?php require_once(__DIR__ . "/../../../partials/flash.php"); ?>
 
 <?php
 //note we need to go up 1 more directory
